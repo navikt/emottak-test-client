@@ -1,4 +1,4 @@
-package no.nav.plugins
+package no.nav.emottak.test.client
 
 import io.ktor.server.application.*
 import io.ktor.server.response.*
