@@ -4,11 +4,11 @@ val logback_version: String by project
 plugins {
     kotlin("jvm") version "2.0.10"
     id("io.ktor.plugin") version "2.3.12"
+    id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
 }
 
 group = "no.nav.emottak"
 version = "0.0.1"
-
 
 application {
     mainClass.set("no.nav.emottak.test.client.ApplicationKt")
@@ -29,26 +29,49 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
 
+tasks {
 
+    shadowJar {
+        archiveFileName.set("app.jar")
+    }
 
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events("failed")
+            showStandardStreams = true
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
+    }
 
-tasks.withType<JavaExec> {
-    val isProduction: Boolean = System.getenv("PRODUCTION")?.toBoolean() ?: false
-    val isDevelopment: Boolean = !isProduction
-    jvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+    ktlintFormat {
+        this.enabled = true
+    }
+    ktlintCheck {
+        dependsOn("ktlintFormat")
+    }
+    build {
+        dependsOn("ktlintCheck")
+    }
 
-    if (isDevelopment) {
-        doFirst {
-            println("Development mode enabled. Starting continuous build with hot-reloading...")
+    withType<JavaExec> {
+        val isProduction: Boolean = System.getenv("PRODUCTION")?.toBoolean() ?: false
+        val isDevelopment: Boolean = !isProduction
+        jvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 
-            Thread {
-                exec {
-                    commandLine("./gradlew", "build", "--continuous")
-                    isIgnoreExitValue = true
-                }
-            }.start()
+        if (isDevelopment) {
+            doFirst {
+                println("Development mode enabled. Starting continuous build with hot-reloading...")
 
-            Thread.sleep(2000)
+                Thread {
+                    exec {
+                        commandLine("./gradlew", "build", "--continuous")
+                        isIgnoreExitValue = true
+                    }
+                }.start()
+
+                Thread.sleep(2000)
+            }
         }
     }
 }
