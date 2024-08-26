@@ -10,11 +10,10 @@ USER 10000
 
 ENV NODE_ENV=production
 ENV PRODUCTION=true
-ENV BACKEND_PORT=8080
 
 WORKDIR /app
 COPY --from=backend-builder /backend/build/libs/app.jar /app/backend.jar
 
-EXPOSE ${BACKEND_PORT}
+EXPOSE 8080
 
-CMD ["java", "-jar", "/app/backend.jar", "--server.port=${BACKEND_PORT}"]
+CMD ["java", "-jar", "/app/backend.jar", "--server.port=8080"]

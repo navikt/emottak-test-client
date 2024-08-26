@@ -9,7 +9,7 @@ spec:
   ingresses:
     - https://emottak-test-client-backend.dev.intern.nav.no
   image: {{image}}
-  port: 3000
+  port: 8080
   replicas:
     max: 1
     min: 1
