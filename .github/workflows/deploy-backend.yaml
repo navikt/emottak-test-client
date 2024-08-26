@@ -13,6 +13,10 @@ env:
   IMAGE_NAME: "ghcr.io/${{ github.repository }}/backend:${{ github.sha }}"
   NAIS_MANIFEST: "backend.yaml"
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-and-push:
     name: Build, push emottak-test-client-backend image
@@ -20,8 +24,6 @@ jobs:
 
     permissions:
       packages: write
-      contents: read
-      id-token: write
 
     steps:
       - uses: actions/checkout@v4
