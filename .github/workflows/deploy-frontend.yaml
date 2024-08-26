@@ -42,7 +42,7 @@ jobs:
 
       - name: "Build and push frontend docker image"
         run: |
-          docker build --tag ${{ env.IMAGE_NAME }} -f frontend/Dockerfile --pull 
+          docker build --tag ${{ env.IMAGE_NAME }} -f frontend/Dockerfile --pull .
           docker push ${{ env.IMAGE_NAME }}
 
   deploy-to-dev:

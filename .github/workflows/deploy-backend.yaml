@@ -41,7 +41,7 @@ jobs:
 
       - name: "Build and push backend docker image"
         run: |
-          docker build --tag ${{ env.IMAGE_NAME }} -f backend/Dockerfile --pull 
+          docker build --tag ${{ env.IMAGE_NAME }} -f backend/Dockerfile --pull .
           docker push ${{ env.IMAGE_NAME }}
   deploy-to-dev:
     name: Deploy emottak-test-client-backend to dev
