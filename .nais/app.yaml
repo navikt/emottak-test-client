@@ -1,0 +1,22 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: emottak-test-client
+  namespace: team-emottak
+  labels:
+    team: team-emottak
+spec:
+  ingresses:
+    - https://emottak-test-client.dev.intern.nav.no
+  image: {{image}}
+  port: 3000
+  replicas:
+    max: 1
+    min: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 512Mi
+      memory: 1000m
