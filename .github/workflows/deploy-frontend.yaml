@@ -49,7 +49,6 @@ jobs:
   deploy-to-dev:
     name: Deploy emottak-test-client to dev
     needs: build-and-push
-    if: github.event.inputs.environment == 'dev-fss'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
