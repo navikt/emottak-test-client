@@ -16,7 +16,7 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: "actions/checkout@v4"
       - name: Build
         run: ./gradlew buildAll
       - name: Deploy to NAIS
