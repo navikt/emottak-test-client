@@ -9,7 +9,7 @@ spec:
   ingresses:
     - https://emottak-test-client.dev.intern.nav.no
   image: {{image}}
-  port: 3000
+  port: 8080
   replicas:
     max: 1
     min: 1
@@ -20,3 +20,10 @@ spec:
     limits:
       cpu: 512Mi
       memory: 1000m
+  accessPolicy:
+    inbound:
+      rules:
+        - application: emottak-test-client-backend
+    outbound:
+      rules:
+        - application: emottak-test-client-backend

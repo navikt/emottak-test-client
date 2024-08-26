@@ -2,6 +2,14 @@ tasks.register("buildAll") {
     dependsOn(":backend:build", ":frontend:buildFrontend")
 }
 
+tasks.register("buildBackend") {
+    dependsOn(":backend:build")
+}
+
+tasks.register("buildFrontend") {
+    dependsOn(":frontend:buildFrontend")
+}
+
 tasks.register("start") {
     dependsOn(":backend:run", ":frontend:startFrontend")
 }
