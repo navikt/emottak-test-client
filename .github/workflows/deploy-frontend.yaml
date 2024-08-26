@@ -10,7 +10,6 @@ on:
       - 'LICENCE'
 
 env:
-  MODULE_NAME: "emottak-test-client"
   IMAGE_NAME: "ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}"
   NAIS_MANIFEST: "frontend.yaml"
   PRODUCTION: true # used to prevent frontend from attempting to connect backend during build
@@ -26,8 +25,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 21
+          distribution: temurin
 
-      - name: Build ${{ env.MODULE_NAME }}
+      - name: Build frontend
         run: ./gradlew buildFrontend
 
       - name: "Login to GitHub Packages Docker Registry"
@@ -37,9 +40,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Build and push ${{ env.MODULE_NAME }} docker image"
+      - name: "Build and push frontend docker image"
         run: |
-          docker build --tag ${{ env.IMAGE_NAME }} -f frontend/Dockerfile ${{ env.MODULE_NAME }} --pull 
+          docker build --tag ${{ env.IMAGE_NAME }} -f frontend/Dockerfile --pull 
           docker push ${{ env.IMAGE_NAME }}
 
   deploy-to-dev:

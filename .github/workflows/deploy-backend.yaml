@@ -10,7 +10,6 @@ on:
       - 'LICENCE'
 
 env:
-  MODULE_NAME: "emottak-test-client-backend"
   IMAGE_NAME: "ghcr.io/${{ github.repository }}/backend:${{ github.sha }}"
   NAIS_MANIFEST: "backend.yaml"
 
@@ -30,7 +29,7 @@ jobs:
           java-version: 21
           distribution: temurin
 
-      - name: Build ${{ env.MODULE_NAME }}
+      - name: Build backend
         run: ./gradlew buildBackend
 
       - name: "Login to GitHub Packages Docker Registry"
@@ -40,9 +39,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Build and push ${{ env.MODULE_NAME }} docker image"
+      - name: "Build and push backend docker image"
         run: |
-          docker build --tag ${{ env.IMAGE_NAME }} -f backend/Dockerfile ${{ env.MODULE_NAME }} --pull 
+          docker build --tag ${{ env.IMAGE_NAME }} -f backend/Dockerfile --pull 
           docker push ${{ env.IMAGE_NAME }}
   deploy-to-dev:
     name: Deploy emottak-test-client-backend to dev
