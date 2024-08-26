@@ -2,14 +2,15 @@
 
 ## TLDR Commands
 
-| Command                                                                               | Description                                     |
-|---------------------------------------------------------------------------------------|-------------------------------------------------|
-| `./gradlew dev`                                                                       | Runs both the backend and frontend concurrently |
-| `./gradlew run`                                                                       | Runs only the Ktor backend                      |
-| `cd frontend && yarn dev`                                                             | Runs only the Next.js frontend                  |
-| `docker build -t emottak-test-client .`                                               | Build local docker image                        |
-| `docker run --name emottak-test-client -p 8080:8080 -p 3000:3000 emottak-test-client` | Run local docker image                          |
-| `docker rm -f emottak-test-client`                                                    | Stop the local container                        |
+| Command                                                                                                                   | Description                                     |
+|---------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
+| `./gradlew dev`                                                                                                           | Runs both the backend and frontend concurrently |
+| `./gradlew run`                                                                                                           | Runs only the Ktor backend                      |
+| `cd frontend && yarn dev`                                                                                                 | Runs only the Next.js frontend                  |
+| `docker build -t emottak-test-client .`                                                                                   | Build local docker image                        |
+| `docker run --name emottak-test-client-backend -p 8080:8080 -t emottak-test-client-backend -f backend/Dockerfile backend` | Run local docker image of backend               |
+| `docker run --name emottak-test-client -p 3000:3000 -t emottak-test-client -f frontend/Dockerfile frontend`               | Run local docker image of frontend              |
+| `docker rm -f emottak-test-client`                                                                                        | Forcefully stop and remove a container          |
 
 ## Running the Full Stack Application
 
