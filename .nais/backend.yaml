@@ -14,12 +14,12 @@ spec:
     max: 1
     min: 1
   resources:
-    requests:
-      cpu: 50m
-      memory: 32Mi
     limits:
-      cpu: 512Mi
-      memory: 1000m
+      cpu: "1000m"
+      memory: "512Mi"
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
   accessPolicy:
     inbound:
       rules:
