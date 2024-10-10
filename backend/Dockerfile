@@ -12,8 +12,6 @@ FROM openjdk:21-jdk-slim AS final-backend
 RUN useradd --uid 10000 --create-home runner
 USER 10000
 
-ARG GITHUB_TOKEN
-ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 ENV NODE_ENV=production
 ENV PRODUCTION=true
 
