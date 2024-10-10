@@ -1,7 +1,5 @@
 FROM node:18-alpine AS base
 
-ARG GITHUB_TOKEN
-ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 
 FROM base AS deps
 

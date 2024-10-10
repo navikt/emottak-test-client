@@ -1,4 +1,8 @@
 FROM gradle:8.10-jdk21 AS backend-builder
+
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+
 WORKDIR /backend
 COPY . .
 RUN gradle build
