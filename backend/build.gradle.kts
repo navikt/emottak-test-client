@@ -83,7 +83,7 @@ tasks {
     }
 
     withType<JavaExec> {
-        val isProduction: Boolean = System.getenv("NAIS_CLUSTER_NAME") != "prod-fss";
+        val isProduction: Boolean = System.getenv("NAIS_CLUSTER_NAME") != "prod-fss"
         val isDevelopment: Boolean = !isProduction
         jvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 
