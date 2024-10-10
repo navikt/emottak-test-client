@@ -34,7 +34,8 @@ jobs:
 
       - name: Build backend
         run: ./gradlew buildBackend
-
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: "Login to GitHub Packages Docker Registry"
         uses: docker/login-action@v3
         with:
