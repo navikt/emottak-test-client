@@ -1,4 +1,4 @@
-name: Build and deploy
+name: "Frontend: Build and deploy"
 on:
   push:
     branches:
