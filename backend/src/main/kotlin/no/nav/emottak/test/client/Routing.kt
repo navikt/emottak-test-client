@@ -10,12 +10,11 @@ import io.ktor.server.application.call
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import no.nav.emottak.test.client.melding.MeldingService
 
 fun Application.configureRouting() {
     routing {
         get("/") {
-            call.respondText(MeldingService().getMessage().toString())
+            call.respondText { "Hello Wurl" }
         }
 
         get("/test") {
