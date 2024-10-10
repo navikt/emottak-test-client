@@ -31,6 +31,19 @@ jobs:
         with:
           java-version: 21
           distribution: temurin
+      - name: Cache gradle wrapper
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('build.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-cache-
 
       - name: Build backend
         run: ./gradlew buildBackend
@@ -43,7 +56,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Build and push backend docker image"
+      - name: "Build and push backend docker image" // TODO: Ensure we cache the gradlew builds!!!
         run: |
           docker build --tag ${{ env.IMAGE_NAME }} -f backend/Dockerfile --pull backend
           docker push ${{ env.IMAGE_NAME }}
