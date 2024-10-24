@@ -52,6 +52,10 @@ dependencies {
     implementation("no.nav.emottak:emottak-payload-xsd:0.0.2")
     implementation("no.nav.emottak:ebxml-protokoll:0.0.6")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.2")
+
+    implementation("io.ktor:ktor-serialization-kotlinx-xml:$ktor_version")
+    implementation("io.ktor:ktor-client-logging:$ktor_version")
+
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
