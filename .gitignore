@@ -1,3 +1,9 @@
+# app sepcific
+
+# Contains necessary credentials for integration testing in dev
+application-test.yml
+application-test.yaml
+
 # Created by https://www.toptal.com/developers/gitignore/api/gradle,intellij+all
 # Edit at https://www.toptal.com/developers/gitignore?templates=gradle,intellij+all
 

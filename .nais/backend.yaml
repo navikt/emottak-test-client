@@ -27,3 +27,8 @@ spec:
     outbound:
       rules:
         - application: emottak-test-client
+  envFrom:
+    - secret: emottak-test-client
+  env:
+    - name: EMOTTAK_LOGGING_LEVEL
+      value: DEBUG
