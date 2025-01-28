@@ -52,6 +52,10 @@ export default function EbxmlForm({ defaultValues }: { defaultValues: EbxmlReque
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
+        <div>
+          <Label htmlFor="cpaId">CPA ID</Label>
+          <Input id="cpaId" name="cpaId" value={formData.cpaId} onChange={handleChange} />
+        </div>
         <Label htmlFor="fromPartyId">From Party ID</Label>
         <Input
           id="fromPartyId"
@@ -69,12 +73,8 @@ export default function EbxmlForm({ defaultValues }: { defaultValues: EbxmlReque
         <Input id="toPartyId" name="toPartyId" value={formData.toPartyId} onChange={handleChange} />
       </div>
       <div>
-        <Label htmlFor="toRole">To Role</Label>
+        <Label htmlFor="toRole">Role</Label>
         <Input id="toRole" name="toRole" value={formData.toRole} onChange={handleChange} />
-      </div>
-      <div>
-        <Label htmlFor="cpaId">CPA ID</Label>
-        <Input id="cpaId" name="cpaId" value={formData.cpaId} onChange={handleChange} />
       </div>
       <div>
         <Label htmlFor="service">Service</Label>
