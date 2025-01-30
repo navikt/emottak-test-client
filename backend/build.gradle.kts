@@ -87,14 +87,18 @@ tasks {
 
     test {
         useJUnitPlatform()
+        environment("VIRKSOMHETSSERTIFIKAT_SIGNERING", System.getenv("VIRKSOMHETSSERTIFIKAT_SIGNERING"))
+        environment("VIRKSOMHETSSERTIFIKAT_CREDENTIALS", System.getenv("VIRKSOMHETSSERTIFIKAT_CREDENTIALS"))
     }
 
     ktlintFormat {
         this.enabled = true
     }
+
     ktlintCheck {
         dependsOn("ktlintFormat")
     }
+
     build {
         dependsOn("ktlintCheck")
     }

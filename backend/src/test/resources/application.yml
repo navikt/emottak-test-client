@@ -1,6 +1,0 @@
-hostName: ${NAIS_CLUSTER_NAME:-local}
-ebmsSyncRouterUrl: "https://ebms-sync-router.dev.intern.nav.no/ebxml/msh"
-alias: "ARBEIDS- OG VELFERDSETATEN"
-signing:
-  key: ${VIRKSOMHETSSERTIFIKAT_SIGNERING}
-  password: ${VIRKSOMHETSSERTIFIKAT_CREDENTIALS}

@@ -10,9 +10,10 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import kotlinx.serialization.json.Json
 import no.nav.emottak.test.client.domain.EbxmlResult
-import java.util.Base64
 import no.nav.emottak.test.client.infrastructure.config.applicationConfig
+import java.util.Base64
 
+// Integration tests for manual testing
 class SendEbxmlMessageUseCaseIntegrationTest : FunSpec({
 
     val testConfig = applicationConfig()
@@ -23,7 +24,7 @@ class SendEbxmlMessageUseCaseIntegrationTest : FunSpec({
         }
     }
 
-    test("Send Frikort Integration Test") {
+    xtest("Send Frikort Integration Test") {
         val frikortPayload = """
         <?xml version="1.0" encoding="utf-8"?>
         <ns:MsgHead xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rawXsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.kith.no/xmlstds/msghead/2006-05-24 MsgHead-v1_2.rawXsd" xmlns:ns="http://www.kith.no/xmlstds/msghead/2006-05-24">
@@ -104,7 +105,7 @@ class SendEbxmlMessageUseCaseIntegrationTest : FunSpec({
         result.shouldBeInstanceOf<EbxmlResult.Success>()
     }
 
-    test("Send Pasientliste Integration Test") {
+    xtest("Send Pasientliste Integration Test") {
 
         val hentPasientlistePayload = """
         <?xml version="1.0" encoding="UTF-8"?>
