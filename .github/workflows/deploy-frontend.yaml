@@ -1,0 +1,63 @@
+name: "Frontend: Build and deploy"
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '**/**.md'
+      - '.gitignore'
+      - 'LICENCE'
+
+env:
+  IMAGE_NAME: "ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}"
+  NAIS_MANIFEST: "frontend.yaml"
+  PRODUCTION: true # used to prevent frontend from attempting to connect backend during build
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push:
+    name: Build, push emottak-test-client image (frontend)
+    runs-on: ubuntu-latest
+
+    permissions:
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - name: Build frontend
+        run: ./gradlew buildFrontend
+
+      - name: "Login to GitHub Packages Docker Registry"
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Build and push frontend docker image"
+        run: |
+          docker build --tag ${{ env.IMAGE_NAME }} -f frontend/Dockerfile --pull frontend
+          docker push ${{ env.IMAGE_NAME }}
+
+  deploy-to-dev:
+    name: Deploy emottak-test-client to dev
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy frontend to dev
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: dev-fss
+          RESOURCE: .nais/frontend.yaml
+          VAR: image=${{env.IMAGE_NAME}}

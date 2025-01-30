@@ -1,0 +1,9 @@
+hostName: ${NAIS_CLUSTER_NAME:-integrationtest}
+ebmsSyncRouterUrl: "https://ebms-sync-router.dev.intern.nav.no/ebxml/msh"
+alias: "ARBEIDS- OG VELFERDSETATEN"
+signing:
+  password: "..."
+  key: |
+    MIIcPgIBAzCCG/gGCSqGSIb3DQEHAaCCG+kkghvlBIIb4TCCG90wggfWBgkqhkiG9w0BBwGgggfH
+    JIIHwwSCB78wgge7MIIHtwYLKoZIhvcNAQwKAQKgggc6MIIHNjAoBgoqhkiG9w0BDAEDMBoEFCBl
+    U/X6lWwdrqb...
