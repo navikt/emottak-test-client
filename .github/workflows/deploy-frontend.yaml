@@ -8,7 +8,7 @@ on:
       - '**/**.md'
       - '.gitignore'
       - 'LICENCE'
-      - './backend/**''
+      - './backend/**'
 
 env:
   IMAGE_NAME: "ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}"
