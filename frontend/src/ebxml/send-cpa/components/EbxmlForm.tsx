@@ -10,6 +10,9 @@ import CodeMirrorWithDelay from "@/ebxml/send-cpa/components/CodeMirror/CodeMirr
 import CpaTemplateSelector from "@/ebxml/send-cpa/components/CpaTemplateSelector/CpaTemplateSelector";
 import { frikortEgenandelForesporselRequest } from "@/ebxml/send-cpa/cpa-templates/cpa-requests/frikort-egenandelforesporsel-request";
 import { Button } from "@/components/ui/button";
+import CodeMirror from "@uiw/react-codemirror";
+import { xml } from "@codemirror/lang-xml";
+import { githubLight } from "@uiw/codemirror-theme-github";
 
 export default function EbxmlForm() {
   const [formData, setFormData] = useState(frikortEgenandelForesporselRequest);
@@ -129,7 +132,9 @@ export default function EbxmlForm() {
               <div className="bg-green-300 p-4 rounded-md  font-bold text-2xl flex justify-center">
                 Success
               </div>
-              <Alert variant="default">{response}</Alert>
+              <Alert variant="default">
+                <CodeMirror value={response} extensions={[xml()]} theme={githubLight} />
+              </Alert>
             </div>
           </>
         )}
