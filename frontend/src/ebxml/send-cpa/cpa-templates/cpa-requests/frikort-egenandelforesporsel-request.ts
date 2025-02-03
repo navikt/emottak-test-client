@@ -1,6 +1,8 @@
 import { EbxmlRequest } from "../../types";
+import { v4 as uuidv4 } from "uuid";
 
 export const frikortEgenandelForesporselRequest: EbxmlRequest = {
+  messageId: uuidv4().toString(),
   fromPartyId: "13579",
   fromRole: "Behandler",
   toPartyId: "79768",

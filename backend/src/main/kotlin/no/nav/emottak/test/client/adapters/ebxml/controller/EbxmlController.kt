@@ -21,14 +21,14 @@ fun Routing.ebxmlFrikortRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCase) 
     post("/ebxml/send-cpa") {
         try {
             val requestBody = call.receiveText()
-            log.info("/ebxml/send-frikort request received: $requestBody")
+            log.debug("/ebxml/send-cpa request received: $requestBody")
 
             val dto = Json.decodeFromString<EbxmlRequestDto>(requestBody)
             val ebxmlRequest = dto.toDomain()
 
             val result = sendEbxmlMessageUseCase.sendEbxmlMessage(ebxmlRequest)
 
-            log.info("/ebxml/send-frikort is returning response: $result")
+            log.debug("/ebxml/send-cpa is returning response: $result")
 
             when (result) {
                 is EbxmlResult.Success -> {
@@ -46,6 +46,7 @@ fun Routing.ebxmlFrikortRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCase) 
 
 @Serializable
 data class EbxmlRequestDto(
+    val messageId: String = UUID.randomUUID().toString(),
     val fromPartyId: String,
     val fromRole: String,
     val toPartyId: String,
@@ -63,6 +64,7 @@ data class EbxmlRequestDto(
 
     fun toDomain(): EbxmlRequest {
         return EbxmlRequest(
+            messageId = messageId,
             fromPartyId = fromPartyId,
             fromRole = fromRole,
             toPartyId = toPartyId,

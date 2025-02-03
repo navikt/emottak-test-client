@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert } from "@/components/ui/alert";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { EbxmlResult, sendEbxmlRequest } from "@/ebxml/send-cpa/actions/send-request";
 import CodeMirrorWithDelay from "@/ebxml/send-cpa/components/CodeMirror/CodeMirrorWithDelay";
@@ -77,11 +77,19 @@ export default function EbxmlForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex">
-        <CpaTemplateSelector selectedTemplate={formData} onTemplateChange={setFormData} />
-        <Button type="button" variant="ghost" onClick={handleClear}>
+      <div className="flex justify-between">
+        <div>
+          <Label className="">CPA Template:</Label>
+          <CpaTemplateSelector selectedTemplate={formData} onTemplateChange={setFormData} />
+        </div>
+        <Button type="button" variant="outline" className="bg-red-100" onClick={handleClear}>
           Clear Form
         </Button>
+      </div>
+
+      <div>
+        <Label htmlFor="messageId">CPA ID</Label>
+        <Input id="messageId" name="messageId" value={formData.messageId} onChange={handleChange} />
       </div>
       <div>
         <Label htmlFor="cpaId">CPA ID</Label>
@@ -123,7 +131,7 @@ export default function EbxmlForm() {
           onChange={(value) => handlePayloadChange(value)}
         />
       </div>
-      <Button type="submit" disabled={loading} variant={"outline"}>
+      <Button type="submit" disabled={loading} variant={"outline"} className="bg-green-100">
         {loading && <Loader2 className="animate-spin w-5 h-5" />}
         {loading ? "Sending..." : "Send Request"}
       </Button>
