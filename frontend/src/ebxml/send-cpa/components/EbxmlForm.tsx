@@ -133,7 +133,7 @@ export default function EbxmlForm() {
                 Success
               </div>
               <Alert variant="default">
-                <CodeMirror value={response} extensions={[xml()]} theme={githubLight} />
+                <CodeMirror readOnly value={response} extensions={[xml()]} theme={githubLight} />
               </Alert>
             </div>
           </>
