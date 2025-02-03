@@ -42,3 +42,10 @@ To run the frontend only, use the following command:
 ```
 
 This command will start the Next.js frontend.
+
+## Logging
+
+### Set LOCAL_LOGGING
+
+To get human readable logs during local development, set the "LOCAL_LOGGING" environment variable to "true".
+By default all logs are parsed as JSON.

@@ -32,6 +32,8 @@ export default function EbxmlForm() {
       action: "",
       ebxmlPayload: { base64Content: "" },
     });
+    setError(null);
+    setResponse(null);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

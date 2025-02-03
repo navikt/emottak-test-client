@@ -1,21 +1,33 @@
 <configuration>
-    <appender name="stdout_json" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <provider class="net.logstash.logback.composite.loggingevent.ArgumentsJsonProvider" />
-            <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
-                <valueMask>
-                    <value>\d{11}</value>
-                    <value>\d{6}\s\d{5}</value>
-                    <mask>***********</mask>
-                </valueMask>
-            </jsonGeneratorDecorator>
-        </encoder>
-    </appender>
-
+    <if condition='("true").equals(System.getenv("LOCAL_LOGGING"))'>
+        <then>
+            <appender name="stdout_plain" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+                </encoder>
+            </appender>
+            <root level="INFO">
+                <appender-ref ref="stdout_plain"/>
+            </root>
+        </then>
+        <else>
+            <appender name="stdout_json" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                    <provider class="net.logstash.logback.composite.loggingevent.ArgumentsJsonProvider"/>
+                    <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
+                        <valueMask>
+                            <value>\d{11}</value>
+                            <value>\d{6}\s\d{5}</value>
+                            <mask>***********</mask>
+                        </valueMask>
+                    </jsonGeneratorDecorator>
+                </encoder>
+            </appender>
+            <root level="INFO">
+                <appender-ref ref="stdout_json"/>
+            </root>
+        </else>
+    </if>
     <logger name="no.nav" level="INFO"/>
     <logger name="no.nav.emottak" level="${EMOTTAK_LOGGING_LEVEL:-INFO}"/>
-
-    <root level="INFO">
-        <appender-ref ref="stdout_json"/>
-    </root>
 </configuration>
