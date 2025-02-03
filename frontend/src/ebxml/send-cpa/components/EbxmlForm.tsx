@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import CodeMirror from "@uiw/react-codemirror";
 import { xml } from "@codemirror/lang-xml";
 import { githubLight } from "@uiw/codemirror-theme-github";
+import { generateKibanaURL } from "@/lib/generate-kibana-url";
 
 export default function EbxmlForm() {
   const [formData, setFormData] = useState(frikortEgenandelForesporselRequest);
@@ -23,6 +24,7 @@ export default function EbxmlForm() {
 
   const handleClear = () => {
     setFormData({
+      messageId: "",
       cpaId: "",
       fromPartyId: "",
       fromRole: "",
@@ -74,6 +76,8 @@ export default function EbxmlForm() {
       }, 100);
     }
   };
+
+  const logsLink = generateKibanaURL(formData.messageId);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -142,6 +146,11 @@ export default function EbxmlForm() {
               <div className="bg-green-300 p-4 rounded-md  font-bold text-2xl flex justify-center">
                 Success
               </div>
+              <div>
+                <a target="_blank" href={logsLink}>
+                  View Logs in Kibana
+                </a>
+              </div>
               <Alert variant="default">
                 <CodeMirror readOnly value={response} extensions={[xml()]} theme={githubLight} />
               </Alert>
@@ -154,6 +163,11 @@ export default function EbxmlForm() {
             <div className="space-y-4">
               <div className="bg-red-300 p-4 rounded-md  font-bold text-2xl flex justify-center">
                 Error
+              </div>
+              <div>
+                <a target="_blank" href={logsLink}>
+                  View Logs in Kibana
+                </a>
               </div>
               <Alert variant="destructive">{error}</Alert>
             </div>
