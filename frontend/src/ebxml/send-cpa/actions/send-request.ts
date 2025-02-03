@@ -1,6 +1,6 @@
 "use server";
 
-import { EbxmlRequest } from "@/ebxml/frikort/types";
+import { EbxmlRequest } from "@/ebxml/send-cpa/types";
 import { config } from "@/infrastructure/config/config";
 
 export type EbxmlResult =
