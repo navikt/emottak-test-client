@@ -10,8 +10,8 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import kotlinx.serialization.json.Json
 import no.nav.emottak.test.client.domain.EbxmlResult
-import java.util.Base64
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
+import java.util.Base64
 
 // Integration tests for manual testing
 class SendEbxmlMessageUseCaseIntegrationTest : FunSpec({
