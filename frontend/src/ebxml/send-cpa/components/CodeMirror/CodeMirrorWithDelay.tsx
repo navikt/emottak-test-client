@@ -2,7 +2,7 @@ import React, { lazy, Suspense, useState, useEffect } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { xml } from "@codemirror/lang-xml";
 import { githubLight } from "@uiw/codemirror-theme-github";
-import CodeMirrorSkeleton from "@/ebxml/frikort/components/CodeMirrow/CodeMirrorSkeleton";
+import CodeMirrorSkeleton from "@/ebxml/send-cpa/components/CodeMirror/CodeMirrorSkeleton";
 
 // UX: This silly thing is here because CodeMirror is recognized as loaded even though it's not,
 // causing us to see a horizontal line instead of a loading skeleton that would normally indicate
@@ -26,10 +26,9 @@ const CodeMirrorWithDelay = ({
   }
 
   return (
-    <div className="min-h-[600px]">
+    <div>
       <CodeMirror
         value={value}
-        height="min-h-[600px]"
         extensions={[xml()]}
         onChange={onChange}
         theme={githubLight}

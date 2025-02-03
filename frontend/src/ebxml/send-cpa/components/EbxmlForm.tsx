@@ -1,25 +1,35 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert } from "@/components/ui/alert";
-import { EbxmlResult, sendEbxmlRequest } from "@/ebxml/frikort/actions/send-request";
-import { EbxmlRequest } from "@/ebxml/frikort/types";
-import React, { lazy, Suspense, useRef, useState } from "react";
-import { xml } from "@codemirror/lang-xml";
+import React, { useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
-import CodeMirrorSkeleton from "@/ebxml/frikort/components/CodeMirrow/CodeMirrorSkeleton";
-import CodeMirror from "@uiw/react-codemirror";
-import { githubLight } from "@uiw/codemirror-theme-github";
-import CodeMirrorWithDelay from "@/ebxml/frikort/components/CodeMirrow/CodeMirrorWithDelay";
+import { EbxmlResult, sendEbxmlRequest } from "@/ebxml/send-cpa/actions/send-request";
+import CodeMirrorWithDelay from "@/ebxml/send-cpa/components/CodeMirror/CodeMirrorWithDelay";
+import CpaTemplateSelector from "@/ebxml/send-cpa/components/CpaTemplateSelector/CpaTemplateSelector";
+import { frikortEgenandelForesporselRequest } from "@/ebxml/send-cpa/cpa-templates/cpa-requests/frikort-egenandelforesporsel-request";
+import { Button } from "@/components/ui/button";
 
-export default function EbxmlForm({ defaultValues }: { defaultValues: EbxmlRequest }) {
-  const [formData, setFormData] = useState(defaultValues);
+export default function EbxmlForm() {
+  const [formData, setFormData] = useState(frikortEgenandelForesporselRequest);
   const [response, setResponse] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const responseRef = useRef<HTMLDivElement | null>(null);
+
+  const handleClear = () => {
+    setFormData({
+      cpaId: "",
+      fromPartyId: "",
+      fromRole: "",
+      toPartyId: "",
+      toRole: "",
+      service: "",
+      action: "",
+      ebxmlPayload: { base64Content: "" },
+    });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -62,6 +72,12 @@ export default function EbxmlForm({ defaultValues }: { defaultValues: EbxmlReque
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex">
+        <CpaTemplateSelector selectedTemplate={formData} onTemplateChange={setFormData} />
+        <Button type="button" variant="ghost" onClick={handleClear}>
+          Clear Form
+        </Button>
+      </div>
       <div>
         <Label htmlFor="cpaId">CPA ID</Label>
         <Input id="cpaId" name="cpaId" value={formData.cpaId} onChange={handleChange} />

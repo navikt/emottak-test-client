@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+import { firaCode, inter, poppins } from "@/app/fonts";
 
 export const metadata: Metadata = {
   title: "Emottak Test Client",
@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${firaCode.variable} ${poppins.variable}`}>
       <body className={inter.className}>{children}</body>
     </html>
   );

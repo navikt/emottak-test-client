@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import EbxmlForm from "@/ebxml/frikort/components/SendFrikortView";
-import { defaultEbxmlFrikortRequest } from "@/ebxml/frikort/default-request";
+import EbxmlForm from "@/ebxml/send-cpa/components/EbxmlForm";
 
 export default function Home() {
   return (
@@ -10,7 +9,7 @@ export default function Home() {
           <CardTitle>Send CPA Request</CardTitle>
         </CardHeader>
         <CardContent>
-          <EbxmlForm defaultValues={defaultEbxmlFrikortRequest} />
+          <EbxmlForm />
         </CardContent>
       </Card>
     </div>

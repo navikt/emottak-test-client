@@ -1,6 +1,6 @@
-import { EbxmlRequest } from "./types";
+import { EbxmlRequest } from "../../types";
 
-export const defaultEbxmlFrikortRequest: EbxmlRequest = {
+export const frikortEgenandelForesporselRequest: EbxmlRequest = {
   fromPartyId: "13579",
   fromRole: "Behandler",
   toPartyId: "79768",
