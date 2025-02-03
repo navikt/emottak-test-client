@@ -16,7 +16,7 @@ import java.util.Base64
 // Integration tests for manual testing
 class SendEbxmlMessageUseCaseIntegrationTest : FunSpec({
 
-    val testConfig = applicationConfig()
+    val testConfig = testApplicationConfig()
     val httpClient = HttpClient(CIO) {
         install(Logging) {
             level = LogLevel.ALL
@@ -24,7 +24,7 @@ class SendEbxmlMessageUseCaseIntegrationTest : FunSpec({
         }
     }
 
-    xtest("Send Frikort Integration Test") {
+    test("Send Frikort Integration Test") {
         val frikortPayload = """
         <?xml version="1.0" encoding="utf-8"?>
         <ns:MsgHead xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rawXsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.kith.no/xmlstds/msghead/2006-05-24 MsgHead-v1_2.rawXsd" xmlns:ns="http://www.kith.no/xmlstds/msghead/2006-05-24">
