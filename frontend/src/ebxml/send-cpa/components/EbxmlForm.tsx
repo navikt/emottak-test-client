@@ -92,7 +92,7 @@ export default function EbxmlForm() {
       </div>
 
       <div>
-        <Label htmlFor="messageId">CPA ID</Label>
+        <Label htmlFor="messageId">Message ID</Label>
         <Input id="messageId" name="messageId" value={formData.messageId} onChange={handleChange} />
       </div>
       <div>
