@@ -1,3 +1,4 @@
+import { encodeXmlToBase64 } from "@/lib/utils";
 import { EbxmlRequest } from "../../types";
 import { v4 as uuidv4 } from "uuid";
 
@@ -12,7 +13,7 @@ export const frikortEgenandelForesporselRequest: EbxmlRequest = {
   service: "HarBorgerFrikort",
   action: "EgenandelForesporsel",
   ebxmlPayload: {
-    base64Content: btoa(
+    base64Content: encodeXmlToBase64(
       `
 <?xml version="1.0" encoding="utf-8"?>
 <ns:MsgHead xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rawXsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.kith.no/xmlstds/msghead/2006-05-24 MsgHead-v1_2.rawXsd" xmlns:ns="http://www.kith.no/xmlstds/msghead/2006-05-24">
