@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import CodeMirror from "@uiw/react-codemirror";
 import { xml } from "@codemirror/lang-xml";
 import { githubLight } from "@uiw/codemirror-theme-github";
-import { generateKibanaURL } from "@/lib/generate-kibana-url";
+import { generateKibanaURL, generateKibanaURLFromConversationId } from "@/lib/generate-kibana-url";
 
 export default function EbxmlForm() {
   const [formData, setFormData] = useState(frikortEgenandelForesporselRequest);
@@ -24,6 +24,7 @@ export default function EbxmlForm() {
 
   const handleClear = () => {
     setFormData({
+      conversationId: "",
       messageId: "",
       cpaId: "",
       fromPartyId: "",
@@ -77,7 +78,7 @@ export default function EbxmlForm() {
     }
   };
 
-  const logsLink = generateKibanaURL(formData.messageId);
+  const logsLink = generateKibanaURLFromConversationId(formData.conversationId);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -91,6 +92,15 @@ export default function EbxmlForm() {
         </Button>
       </div>
 
+      <div>
+        <Label htmlFor="conversationId">Conversation ID</Label>
+        <Input
+          id="conversationId"
+          name="conversationId"
+          value={formData.conversationId}
+          onChange={handleChange}
+        />
+      </div>
       <div>
         <Label htmlFor="messageId">Message ID</Label>
         <Input id="messageId" name="messageId" value={formData.messageId} onChange={handleChange} />

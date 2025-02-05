@@ -137,7 +137,8 @@ class SendEbxmlMessageUseCase(private val applicationConfig: ApplicationConfig, 
 
     private fun validateRequestDto(requestDto: EbxmlRequest) {
         val errors = mutableListOf<String>()
-
+        if (requestDto.messageId.isBlank()) errors.add("messageId cannot be blank")
+        if (requestDto.conversationId.isBlank()) errors.add("conversationId cannot be blank")
         if (requestDto.fromPartyId.isBlank()) errors.add("fromPartyId cannot be blank")
         if (requestDto.fromRole.isBlank()) errors.add("fromRole cannot be blank")
         if (requestDto.toPartyId.isBlank()) errors.add("toPartyId cannot be blank")

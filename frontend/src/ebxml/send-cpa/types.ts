@@ -1,4 +1,5 @@
 export interface EbxmlRequest {
+  conversationId: string;
   messageId: string;
   fromPartyId: string;
   fromRole: string;

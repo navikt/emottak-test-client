@@ -46,6 +46,7 @@ fun Routing.ebxmlFrikortRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCase) 
 
 @Serializable
 data class EbxmlRequestDto(
+    val conversationId: String = UUID.randomUUID().toString(),
     val messageId: String = UUID.randomUUID().toString(),
     val fromPartyId: String,
     val fromRole: String,
@@ -64,6 +65,7 @@ data class EbxmlRequestDto(
 
     fun toDomain(): EbxmlRequest {
         return EbxmlRequest(
+            conversationId = conversationId,
             messageId = messageId,
             fromPartyId = fromPartyId,
             fromRole = fromRole,

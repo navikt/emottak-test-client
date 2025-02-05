@@ -2,6 +2,7 @@ import { EbxmlRequest } from "../../types";
 import { v4 as uuidv4 } from "uuid";
 
 export const pasientlisteForesporselHentPasientlisteRequest: EbxmlRequest = {
+  conversationId: uuidv4().toString(),
   messageId: uuidv4().toString(),
   fromPartyId: "13579",
   fromRole: "Fastlege",
