@@ -24,6 +24,7 @@ export default function EbxmlForm() {
   const [loading, setLoading] = useState(false);
   const [autoReloadConversationId, setAutoReloadConversationId] = useState(true);
   const [autoReloadMessageId, setAutoReloadMessageId] = useState(true);
+  const [lastUsedConversationId, setLastUsedConversationId] = useState("");
 
   const responseRef = useRef<HTMLDivElement | null>(null);
 
@@ -66,13 +67,15 @@ export default function EbxmlForm() {
     setLoading(true);
 
     try {
-      const response: EbxmlResult = await sendEbxmlRequest(formData);
+      const result: EbxmlResult = await sendEbxmlRequest(formData);
 
-      if (response.type === "Success") {
-        setResponse(response.message);
+      if (result.type === "Success") {
+        setResponse(result.message);
       } else {
-        setError(response.error);
+        setError(result.error);
       }
+
+      setLastUsedConversationId(formData.conversationId);
 
       setFormData((prev) => ({
         ...prev,
@@ -89,7 +92,7 @@ export default function EbxmlForm() {
     }
   };
 
-  const logsLink = generateKibanaURLFromConversationId(formData.conversationId);
+  const logsLink = generateKibanaURLFromConversationId(lastUsedConversationId);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -106,7 +109,6 @@ export default function EbxmlForm() {
       <div className="flex items-center gap-2">
         <div className="flex-1">
           <Label htmlFor="conversationId">Conversation ID</Label>
-
           <div className="flex items-center gap-2">
             <Input
               id="conversationId"
