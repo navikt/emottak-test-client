@@ -116,6 +116,7 @@ class SendEbxmlMessageUseCase(private val applicationConfig: ApplicationConfig, 
 
                 val responseBody = response.bodyAsText()
                 if (response.status == HttpStatusCode.OK) {
+                    log.info("Successfully sent ebXML request")
                     EbxmlResult.Success(responseBody)
                 } else {
                     log.error("Failed request with status: ${response.status}")
@@ -129,8 +130,10 @@ class SendEbxmlMessageUseCase(private val applicationConfig: ApplicationConfig, 
                 EbxmlResult.Failure("Exception: ${e.message}")
             }
         } catch (ex: IllegalArgumentException) {
+            log.error("Validation failed: ${ex.message}", ex)
             EbxmlResult.Failure("Validation failed: ${ex.message}, 400")
         } catch (ex: Exception) {
+            log.error("Unexpected error: ${ex.message}", ex)
             EbxmlResult.Failure("Unexpected error: ${ex.message}, 500")
         }
     }

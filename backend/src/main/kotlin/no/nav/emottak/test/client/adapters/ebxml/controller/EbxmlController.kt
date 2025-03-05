@@ -15,8 +15,8 @@ import no.nav.emottak.test.client.domain.EbxmlResult
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
-fun Routing.ebxmlFrikortRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCase) {
-    val log = LoggerFactory.getLogger("no.nav.emottak.test.client.adapters.ebxml.controller.ebxmlFrikortRoute")
+fun Routing.sendEbxmlMessageRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCase) {
+    val log = LoggerFactory.getLogger("no.nav.emottak.test.client.adapters.ebxml.controller.sendEbxmlMessageRoute")
 
     post("/ebxml/send-cpa") {
         try {

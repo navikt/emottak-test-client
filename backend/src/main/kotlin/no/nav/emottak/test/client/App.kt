@@ -13,7 +13,7 @@ import io.ktor.server.netty.Netty
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import no.nav.emottak.test.client.adapters.ebxml.controller.ebxmlFrikortRoute
+import no.nav.emottak.test.client.adapters.ebxml.controller.sendEbxmlMessageRoute
 import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageUseCase
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.config.applicationConfig
@@ -28,7 +28,7 @@ fun Application.module() {
 
     val applicationConfig: ApplicationConfig = applicationConfig()
     val sendEbxmlMessageUseCase = createSendEbxmlMessageUseCase(applicationConfig)
-    registerEbxmlFrikortRoute(sendEbxmlMessageUseCase)
+    registerSendEbxmlMessageRoute(sendEbxmlMessageUseCase)
 
     configureHelloWorldRouting()
 }
@@ -43,9 +43,9 @@ private fun createSendEbxmlMessageUseCase(applicationConfig: ApplicationConfig):
     return SendEbxmlMessageUseCase(applicationConfig, httpClient)
 }
 
-private fun Application.registerEbxmlFrikortRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCase) {
+private fun Application.registerSendEbxmlMessageRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCase) {
     routing {
-        ebxmlFrikortRoute(sendEbxmlMessageUseCase)
+        sendEbxmlMessageRoute(sendEbxmlMessageUseCase)
     }
 }
 

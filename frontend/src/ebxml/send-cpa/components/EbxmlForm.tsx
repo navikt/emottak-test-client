@@ -3,8 +3,8 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert } from "@/components/ui/alert";
-import React, { useEffect, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { Loader2, RefreshCw } from "lucide-react";
 import { EbxmlResult, sendEbxmlRequest } from "@/ebxml/send-cpa/actions/send-request";
 import CodeMirrorWithDelay from "@/ebxml/send-cpa/components/CodeMirror/CodeMirrorWithDelay";
 import CpaTemplateSelector from "@/ebxml/send-cpa/components/CpaTemplateSelector/CpaTemplateSelector";
@@ -13,13 +13,18 @@ import { Button } from "@/components/ui/button";
 import CodeMirror from "@uiw/react-codemirror";
 import { xml } from "@codemirror/lang-xml";
 import { githubLight } from "@uiw/codemirror-theme-github";
-import { generateKibanaURL, generateKibanaURLFromConversationId } from "@/lib/generate-kibana-url";
+import { generateKibanaURLFromConversationId } from "@/lib/generate-kibana-url";
+import { v4 as uuidv4 } from "uuid";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function EbxmlForm() {
   const [formData, setFormData] = useState(frikortEgenandelForesporselRequest);
   const [response, setResponse] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [autoReloadConversationId, setAutoReloadConversationId] = useState(true);
+  const [autoReloadMessageId, setAutoReloadMessageId] = useState(true);
+
   const responseRef = useRef<HTMLDivElement | null>(null);
 
   const handleClear = () => {
@@ -68,6 +73,12 @@ export default function EbxmlForm() {
       } else {
         setError(response.error);
       }
+
+      setFormData((prev) => ({
+        ...prev,
+        conversationId: autoReloadConversationId ? uuidv4().toString() : prev.conversationId,
+        messageId: autoReloadMessageId ? uuidv4().toString() : prev.messageId,
+      }));
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -84,7 +95,7 @@ export default function EbxmlForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex justify-between">
         <div>
-          <Label className="">CPA Template:</Label>
+          <Label>CPA Template:</Label>
           <CpaTemplateSelector selectedTemplate={formData} onTemplateChange={setFormData} />
         </div>
         <Button type="button" variant="outline" className="bg-red-100" onClick={handleClear}>
@@ -92,19 +103,47 @@ export default function EbxmlForm() {
         </Button>
       </div>
 
-      <div>
-        <Label htmlFor="conversationId">Conversation ID</Label>
-        <Input
-          id="conversationId"
-          name="conversationId"
-          value={formData.conversationId}
-          onChange={handleChange}
-        />
+      <div className="flex items-center gap-2">
+        <div className="flex-1">
+          <Label htmlFor="conversationId">Conversation ID</Label>
+
+          <div className="flex items-center gap-2">
+            <Input
+              id="conversationId"
+              name="conversationId"
+              value={formData.conversationId}
+              onChange={(e) => setFormData({ ...formData, conversationId: e.target.value })}
+            />
+            <Checkbox
+              id="autoReloadConversationId"
+              checked={autoReloadConversationId}
+              onCheckedChange={(checked) => setAutoReloadConversationId(!!checked)}
+            />
+            <RefreshCw className="w-5 h-5 text-gray-500 cursor-pointer" />
+          </div>
+        </div>
       </div>
-      <div>
-        <Label htmlFor="messageId">Message ID</Label>
-        <Input id="messageId" name="messageId" value={formData.messageId} onChange={handleChange} />
+
+      <div className="flex items-center gap-2">
+        <div className="flex-1">
+          <Label htmlFor="messageId">Message ID</Label>
+          <div className="h-full flex items-center gap-2">
+            <Input
+              id="messageId"
+              name="messageId"
+              value={formData.messageId}
+              onChange={handleChange}
+            />
+            <Checkbox
+              id="autoReloadMessageId"
+              checked={autoReloadMessageId}
+              onCheckedChange={(checked) => setAutoReloadMessageId(!!checked)}
+            />
+            <RefreshCw className="w-5 h-5 text-gray-500 cursor-pointer" />
+          </div>
+        </div>
       </div>
+
       <div>
         <Label htmlFor="cpaId">CPA ID</Label>
         <Input id="cpaId" name="cpaId" value={formData.cpaId} onChange={handleChange} />
@@ -149,6 +188,7 @@ export default function EbxmlForm() {
         {loading && <Loader2 className="animate-spin w-5 h-5" />}
         {loading ? "Sending..." : "Send Request"}
       </Button>
+
       <div ref={responseRef}>
         {response && (
           <>

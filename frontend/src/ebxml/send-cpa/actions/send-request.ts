@@ -20,12 +20,10 @@ export async function sendEbxmlRequest(ebxmlRequest: EbxmlRequest): Promise<Ebxm
 
   if (result.ok) {
     if ("message" in responseBody) {
-      // TODO: Check if message contains an Error and handle it manually here, since some req return 200!
       return { type: "Success", message: responseBody.message };
     }
     throw new Error("Unexpected response structure for Success response");
   }
-
   const errorMessage = responseBody.error || "Unknown error";
   return { type: "Failure", error: errorMessage, statusCode: result.status };
 }
