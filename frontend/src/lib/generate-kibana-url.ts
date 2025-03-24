@@ -5,8 +5,8 @@ export function generateKibanaURL(messageId: string) {
 
   const _g = {
     filters: [],
-    refreshInterval: { pause: true, value: 5000 },
-    time: { from: "now-15m", to: "now" },
+    refreshInterval: { pause: false, value: 5000 },
+    time: { from: "now-15h", to: "now" },
   };
 
   const _a = {
@@ -59,8 +59,8 @@ export function generateKibanaURLFromConversationId(conversationId: string) {
 
   const _g = {
     filters: [],
-    refreshInterval: { pause: true, value: 5000 },
-    time: { from: "now-15m", to: "now" },
+    refreshInterval: { pause: false, value: 5000 },
+    time: { from: "now-15h", to: "now" },
   };
 
   const _a = {
