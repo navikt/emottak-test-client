@@ -5,7 +5,6 @@ ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 
 WORKDIR /backend
 COPY . .
-RUN gradle build
 
 FROM openjdk:21-jdk-slim AS final-backend
 
