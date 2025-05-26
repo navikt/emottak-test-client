@@ -49,6 +49,8 @@ jobs:
           dockerfile: backend/Dockerfile
           docker_context: backend
           image_suffix: backend
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
       backendimage: ${{ steps.docker-push-backend.outputs.image }}
 
