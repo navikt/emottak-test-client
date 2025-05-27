@@ -1,7 +1,14 @@
 package no.nav.emottak.test.client.application.ebxml.usecases.builders
 
+import java.text.SimpleDateFormat
+import java.util.Base64
+import java.util.Date
+import javax.xml.namespace.QName
+import javax.xml.parsers.DocumentBuilderFactory
 import no.nav.emottak.test.client.application.ebxml.usecases.EbxmlRequest
+import no.nav.emottak.test.client.domain.Payload
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
+import no.nav.emottak.test.client.infrastructure.xml.asByteArray
 import no.nav.emottak.test.client.infrastructure.xml.xmlMarshaller
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.From
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest
@@ -12,24 +19,46 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To
+import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
 import org.xmlsoap.schemas.soap.envelope.Body
 import org.xmlsoap.schemas.soap.envelope.Envelope
 import org.xmlsoap.schemas.soap.envelope.Header
-import java.text.SimpleDateFormat
-import java.util.Date
-import javax.xml.namespace.QName
+
 
 class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, private val requestDto: EbxmlRequest) {
 
-    private val payloadSigner = PayloadSigner(
+    private val documentSigner = DocumentSigner(
         applicationConfig.signing.key,
         applicationConfig.signing.password.toCharArray(),
         applicationConfig.alias
     )
 
-    private val payload = requestDto.ebxmlPayload?.let {
-        PayloadBuilder().buildPayload(it)
+    private val payload: Payload? = requestDto.let {
+        if (it.ebxmlPayload == null) return@let null
+        LoggerFactory.getLogger(this::class.java.name).info("AYYLMAO")
+        var payloadAsBytes: ByteArray = Base64.getDecoder().decode(it.ebxmlPayload.base64Content.trim())
+        if (it.signPayload == true) {
+            val factory = DocumentBuilderFactory.newInstance()
+            val docBuilder = factory.newDocumentBuilder()
+            val document = docBuilder.parse(payloadAsBytes.inputStream())
+            payloadAsBytes = documentSigner.signerXML(
+                document
+            ).asByteArray()
+        }
+        val contentId = if (it.ebxmlPayload.contentId.startsWith("cid:")) {
+            it.ebxmlPayload.contentId
+        } else {
+            "cid:${it.ebxmlPayload.contentId}"
+        }
+
+        println(contentId)
+        println(payloadAsBytes.size)
+        return@let Payload(
+            bytes = payloadAsBytes,
+            contentType = "application/xml",
+            contentId = contentId
+        )
     }
 
     fun buildAndSign(): Document {
@@ -40,7 +69,7 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
         println("Canonicalized XML:\n$canonicalizedXml")
 
         val attachments = listOfNotNull(payload)
-        val signedDocument = payloadSigner.signDocument(document, attachments)
+        val signedDocument = documentSigner.signDocument(document, attachments)
         insertSignatureIntoHeader(signedDocument)
         return signedDocument
     }

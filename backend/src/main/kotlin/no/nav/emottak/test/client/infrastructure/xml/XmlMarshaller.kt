@@ -41,6 +41,10 @@ class XmlMarshaller {
         return writer.toString()
     }
 
+    fun unmarshal(byteArray: ByteArray): Document {
+        return xmlMarshaller.unmarshal(String(byteArray), Document::class.java)
+    }
+
     fun marshal(envelope: Envelope): Document {
         val out = ByteArrayOutputStream()
         synchronized(marshlingMonitor) {

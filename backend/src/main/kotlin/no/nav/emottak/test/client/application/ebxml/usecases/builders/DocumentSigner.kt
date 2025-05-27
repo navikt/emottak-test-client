@@ -13,6 +13,7 @@ import javax.xml.crypto.XMLStructure
 import javax.xml.crypto.dom.DOMStructure
 import javax.xml.crypto.dsig.SignedInfo
 import javax.xml.crypto.dsig.Transform
+import javax.xml.crypto.dsig.XMLSignature
 import javax.xml.crypto.dsig.XMLSignatureFactory
 import javax.xml.crypto.dsig.dom.DOMSignContext
 import javax.xml.crypto.dsig.keyinfo.KeyInfo
@@ -20,8 +21,10 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory
 import javax.xml.crypto.dsig.keyinfo.X509Data
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec
 import javax.xml.crypto.dsig.spec.TransformParameterSpec
+import no.nav.emottak.test.client.infrastructure.xml.asString
+import org.slf4j.LoggerFactory
 
-class PayloadSigner(keystoreBase64: String, keystorePassword: CharArray, alias: String) {
+class DocumentSigner(keystoreBase64: String, keystorePassword: CharArray, alias: String) {
 
     private val signingKey: PrivateKey
     private val signingCertificate: X509Certificate
@@ -46,6 +49,43 @@ class PayloadSigner(keystoreBase64: String, keystorePassword: CharArray, alias: 
         println("  Valid From: ${signingCertificate.notBefore}")
         println("  Valid To: ${signingCertificate.notAfter}")
         println("  Public Key: ${signingCertificate.publicKey}")
+    }
+
+    fun signerXML(document: Document): Document {
+        val signature = buildXmlSignature(signingCertificate)
+        signature.sign(DOMSignContext(signingKey, document.documentElement))
+        return document.also {
+            LoggerFactory.getLogger("Doc is being signed").info(it.asString())
+        }
+    }
+
+    private fun buildXmlSignature(signerCertificate: X509Certificate): XMLSignature {
+        val keyInfoFactory = factory.keyInfoFactory
+        val x509Content: MutableList<Any?> = ArrayList()
+        x509Content.add(signerCertificate)
+        val x509data = keyInfoFactory.newX509Data(x509Content)
+        val keyInfo = keyInfoFactory.newKeyInfo(listOf(x509data))
+        val signature = factory.newXMLSignature(createSignedInfo(), keyInfo)
+        return signature
+    }
+
+    private fun createSignedInfo(): SignedInfo {
+        return factory.newSignedInfo(
+            factory.newCanonicalizationMethod(
+                canonicalizationMethod,
+                null as C14NMethodParameterSpec?
+            ),
+            factory.newSignatureMethod(signatureAlgorithm, null),
+            listOf(
+                factory.newReference(
+                    "",
+                    factory.newDigestMethod(digestAlgorithm, null),
+                    listOf(factory.newTransform(Transform.ENVELOPED, null as TransformParameterSpec?)),
+                    null,
+                    null
+                )
+            )
+        )
     }
 
     fun signDocument(document: Document, attachments: List<Payload>): Document {

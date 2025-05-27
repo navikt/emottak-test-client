@@ -9,6 +9,7 @@ export interface EbxmlRequest {
   service: string;
   action: string;
   ebxmlPayload?: EbxmlPayload;
+  signPayload: boolean;
 }
 
 export interface EbxmlPayload {
