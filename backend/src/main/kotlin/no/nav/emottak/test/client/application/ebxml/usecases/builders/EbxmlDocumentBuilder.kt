@@ -10,6 +10,8 @@ import no.nav.emottak.test.client.domain.Payload
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.xml.asByteArray
 import no.nav.emottak.test.client.infrastructure.xml.xmlMarshaller
+import org.apache.xml.security.signature.XMLSignature
+import org.apache.xml.security.utils.Constants
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.From
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageData
@@ -19,8 +21,9 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To
-import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.NodeList
 import org.xmlsoap.schemas.soap.envelope.Body
 import org.xmlsoap.schemas.soap.envelope.Envelope
 import org.xmlsoap.schemas.soap.envelope.Header
@@ -28,23 +31,38 @@ import org.xmlsoap.schemas.soap.envelope.Header
 
 class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, private val requestDto: EbxmlRequest) {
 
+    init {
+        org.apache.xml.security.Init.init();
+    }
+
     private val documentSigner = DocumentSigner(
         applicationConfig.signing.key,
         applicationConfig.signing.password.toCharArray(),
         applicationConfig.alias
     )
 
-    private val payload: Payload? = requestDto.let {
+    fun ByteArray.asDocument(): Document {
+        val factory = DocumentBuilderFactory.newInstance()
+        factory.isNamespaceAware = true
+        val docBuilder = factory.newDocumentBuilder()
+        return docBuilder.parse(this.inputStream())
+    }
+
+    val payload: Payload? = requestDto.let {
         if (it.ebxmlPayload == null) return@let null
-        LoggerFactory.getLogger(this::class.java.name).info("AYYLMAO")
+        println("Signing PAYLOAD")
         var payloadAsBytes: ByteArray = Base64.getDecoder().decode(it.ebxmlPayload.base64Content.trim())
         if (it.signPayload == true) {
             val factory = DocumentBuilderFactory.newInstance()
+            factory.isNamespaceAware = true
             val docBuilder = factory.newDocumentBuilder()
             val document = docBuilder.parse(payloadAsBytes.inputStream())
             payloadAsBytes = documentSigner.signerXML(
                 document
             ).asByteArray()
+        }
+        with(payloadAsBytes.asDocument().retrieveSignatureElement()) {
+            checkSignatureValue(keyInfo.x509Certificate)
         }
         val contentId = if (it.ebxmlPayload.contentId.startsWith("cid:")) {
             it.ebxmlPayload.contentId
@@ -71,7 +89,19 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
         val attachments = listOfNotNull(payload)
         val signedDocument = documentSigner.signDocument(document, attachments)
         insertSignatureIntoHeader(signedDocument)
+
+//        with(payload!!.bytes.asDocument().retrieveSignatureElement()) {
+//            println("CHECKING SIGNATURE: ${checkSignatureValue(keyInfo.x509Certificate)}")
+//        }
         return signedDocument
+    }
+
+    fun Document.retrieveSignatureElement(): XMLSignature {
+        val nodeList: NodeList = this.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE)
+        // Regel ID 45, 52
+        if (nodeList.length != 1) throw RuntimeException("${nodeList.length} signaturer i dokumentet! Skal være nøyaktig 1")
+        // Regel ID 363, 42, 32
+        return XMLSignature(nodeList.item(0) as Element, Constants.SignatureSpecNS)
     }
 
     fun buildEnvelope(): Envelope {

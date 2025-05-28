@@ -10,6 +10,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
+import io.ktor.util.encodeBase64
+import java.time.Instant
+import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -18,8 +21,6 @@ import no.nav.emottak.test.client.domain.EbxmlResult
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.xml.xmlMarshaller
 import org.slf4j.LoggerFactory
-import java.time.Instant
-import java.util.UUID
 
 @Serializable
 data class EbxmlRequest(
@@ -34,7 +35,7 @@ data class EbxmlRequest(
     val messageId: String = UUID.randomUUID().toString(),
     val timestamp: String = Instant.now().toString(),
     val ebxmlPayload: EbxmlPayload? = null,
-    val signPayload: Boolean? = false
+    val signPayload: Boolean? = true
 )
 
 @Serializable
@@ -47,6 +48,7 @@ class SendEbxmlMessageUseCase(private val applicationConfig: ApplicationConfig, 
 
     private val log = LoggerFactory.getLogger(SendEbxmlMessageUseCase::class.java)
 
+
     suspend fun sendEbxmlMessage(requestDto: EbxmlRequest): EbxmlResult {
         return try {
             validateRequestDto(requestDto)
@@ -57,7 +59,7 @@ class SendEbxmlMessageUseCase(private val applicationConfig: ApplicationConfig, 
 
             val soapMessageContentId = "<${UUID.randomUUID()}@emottak-test.nav.no>"
 
-            val base64Payload = requestDto.ebxmlPayload?.base64Content
+            val base64Payload = String(builder.payload!!.bytes).encodeBase64()
             val payloadContentId = "<${requestDto.ebxmlPayload?.contentId}>"
 
             val boundary = UUID.randomUUID().toString()

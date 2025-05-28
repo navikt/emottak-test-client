@@ -90,6 +90,7 @@ class DocumentSigner(keystoreBase64: String, keystorePassword: CharArray, alias:
 
     fun signDocument(document: Document, attachments: List<Payload>): Document {
         val keyInfo = createKeyInfo()
+        println("Signing EBXML ENVELOPE")
         val domSignContext = DOMSignContext(signingKey, document.documentElement)
         val defaultResolver = factory.uriDereferencer
         domSignContext.uriDereferencer = EbmsAttachmentURIDereferencer(attachments, defaultResolver)
