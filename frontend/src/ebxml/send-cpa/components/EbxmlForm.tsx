@@ -40,6 +40,7 @@ export default function EbxmlForm() {
       service: "",
       action: "",
       ebxmlPayload: { base64Content: "" },
+      signPayload: false
     });
     setError(null);
     setResponse(null);

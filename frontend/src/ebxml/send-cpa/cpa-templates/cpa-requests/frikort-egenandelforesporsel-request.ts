@@ -3,6 +3,7 @@ import { EbxmlRequest } from "../../types";
 import { v4 as uuidv4 } from "uuid";
 
 export const frikortEgenandelForesporselRequest: EbxmlRequest = {
+  signPayload: false,
   conversationId: uuidv4().toString(),
   messageId: uuidv4().toString(),
   fromPartyId: "13579",
@@ -69,5 +70,5 @@ export const frikortEgenandelForesporselRequest: EbxmlRequest = {
 </ns:MsgHead>
     `.trim()
     ),
-  },
+  }
 };

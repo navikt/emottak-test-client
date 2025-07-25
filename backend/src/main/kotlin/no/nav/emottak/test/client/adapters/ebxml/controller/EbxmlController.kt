@@ -55,7 +55,8 @@ data class EbxmlRequestDto(
     val cpaId: String,
     val service: String,
     val action: String,
-    val ebxmlPayload: PayloadDto? = null
+    val ebxmlPayload: PayloadDto? = null,
+    val signPayload: Boolean = false
 ) {
     @Serializable
     data class PayloadDto(
