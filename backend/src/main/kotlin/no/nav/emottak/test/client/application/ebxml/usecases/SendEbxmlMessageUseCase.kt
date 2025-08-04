@@ -11,8 +11,6 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.util.encodeBase64
-import java.time.Instant
-import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -21,6 +19,8 @@ import no.nav.emottak.test.client.domain.EbxmlResult
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.xml.xmlMarshaller
 import org.slf4j.LoggerFactory
+import java.time.Instant
+import java.util.UUID
 
 @Serializable
 data class EbxmlRequest(
@@ -47,7 +47,6 @@ data class EbxmlPayload(
 class SendEbxmlMessageUseCase(private val applicationConfig: ApplicationConfig, private val httpClient: HttpClient) {
 
     private val log = LoggerFactory.getLogger(SendEbxmlMessageUseCase::class.java)
-
 
     suspend fun sendEbxmlMessage(requestDto: EbxmlRequest): EbxmlResult {
         return try {

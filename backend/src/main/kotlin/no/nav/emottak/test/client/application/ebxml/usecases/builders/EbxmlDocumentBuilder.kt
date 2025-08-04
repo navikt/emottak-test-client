@@ -1,10 +1,5 @@
 package no.nav.emottak.test.client.application.ebxml.usecases.builders
 
-import java.text.SimpleDateFormat
-import java.util.Base64
-import java.util.Date
-import javax.xml.namespace.QName
-import javax.xml.parsers.DocumentBuilderFactory
 import no.nav.emottak.test.client.application.ebxml.usecases.EbxmlRequest
 import no.nav.emottak.test.client.domain.Payload
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
@@ -27,12 +22,16 @@ import org.w3c.dom.NodeList
 import org.xmlsoap.schemas.soap.envelope.Body
 import org.xmlsoap.schemas.soap.envelope.Envelope
 import org.xmlsoap.schemas.soap.envelope.Header
-
+import java.text.SimpleDateFormat
+import java.util.Base64
+import java.util.Date
+import javax.xml.namespace.QName
+import javax.xml.parsers.DocumentBuilderFactory
 
 class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, private val requestDto: EbxmlRequest) {
 
     init {
-        org.apache.xml.security.Init.init();
+        org.apache.xml.security.Init.init()
     }
 
     private val documentSigner = DocumentSigner(

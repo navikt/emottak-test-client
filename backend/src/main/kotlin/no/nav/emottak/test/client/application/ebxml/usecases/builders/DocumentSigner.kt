@@ -2,7 +2,9 @@ package no.nav.emottak.test.client.application.ebxml.usecases.builders
 
 import no.nav.emottak.test.client.domain.Payload
 import no.nav.emottak.test.client.infrastructure.xml.EbmsAttachmentURIDereferencer
+import no.nav.emottak.test.client.infrastructure.xml.asString
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
 import java.security.KeyStore
 import java.security.PrivateKey
@@ -21,8 +23,6 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory
 import javax.xml.crypto.dsig.keyinfo.X509Data
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec
 import javax.xml.crypto.dsig.spec.TransformParameterSpec
-import no.nav.emottak.test.client.infrastructure.xml.asString
-import org.slf4j.LoggerFactory
 
 class DocumentSigner(keystoreBase64: String, keystorePassword: CharArray, alias: String) {
 
