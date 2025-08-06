@@ -92,11 +92,15 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
         return signedDocument
     }
 
+    /**
+     * Validerer signatur ifølge "Validering av ebXML-meldinger" 5.10.1
+     */
     fun Document.retrieveSignatureElement(): XMLSignature {
         val nodeList: NodeList = this.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE)
-        // Regel ID 45, 52
+        // Regel ID 52: Mer enn ett Signature-element
+        // Regel ID 45: Signature mangler i SOAP:Header
         if (nodeList.length != 1) throw RuntimeException("${nodeList.length} signaturer i dokumentet! Skal være nøyaktig 1")
-        // Regel ID 363, 42, 32
+        // Regel ID 363, 42, 32: Mangler SignedInfo, SignatureValue eller KeyInfo
         return XMLSignature(nodeList.item(0) as Element, Constants.SignatureSpecNS)
     }
 
