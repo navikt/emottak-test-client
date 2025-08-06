@@ -16,6 +16,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To
+import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.NodeList
@@ -34,6 +35,7 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
         org.apache.xml.security.Init.init()
     }
 
+    private val log = LoggerFactory.getLogger(EbxmlDocumentBuilder::class.java)
     private val documentSigner = DocumentSigner(
         applicationConfig.signing.key,
         applicationConfig.signing.password.toCharArray(),
@@ -49,7 +51,7 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
 
     val payload: Payload? = requestDto.let {
         if (it.ebxmlPayload == null) return@let null
-        println("Signing PAYLOAD")
+        log.info("Signing Payload")
         var payloadAsBytes: ByteArray = Base64.getDecoder().decode(it.ebxmlPayload.base64Content.trim())
         if (it.signPayload == true) {
             val factory = DocumentBuilderFactory.newInstance()
@@ -69,8 +71,6 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
             "cid:${it.ebxmlPayload.contentId}"
         }
 
-        println(contentId)
-        println(payloadAsBytes.size)
         return@let Payload(
             bytes = payloadAsBytes,
             contentType = "application/xml",
@@ -83,7 +83,7 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
         val document = xmlMarshaller.marshal(envelope)
 
         val canonicalizedXml = xmlMarshaller.documentToString(document)
-        println("Canonicalized XML:\n$canonicalizedXml")
+        log.debug("Canonicalized XML:\n$canonicalizedXml")
 
         val attachments = listOfNotNull(payload)
         val signedDocument = documentSigner.signDocument(document, attachments)
