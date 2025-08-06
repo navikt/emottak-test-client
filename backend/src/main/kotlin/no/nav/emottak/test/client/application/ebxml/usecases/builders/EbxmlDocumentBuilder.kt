@@ -89,9 +89,6 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
         val signedDocument = documentSigner.signDocument(document, attachments)
         insertSignatureIntoHeader(signedDocument)
 
-//        with(payload!!.bytes.asDocument().retrieveSignatureElement()) {
-//            println("CHECKING SIGNATURE: ${checkSignatureValue(keyInfo.x509Certificate)}")
-//        }
         return signedDocument
     }
 

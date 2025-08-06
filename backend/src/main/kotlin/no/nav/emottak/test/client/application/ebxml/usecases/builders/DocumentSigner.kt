@@ -26,6 +26,7 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec
 
 class DocumentSigner(keystoreBase64: String, keystorePassword: CharArray, alias: String) {
 
+    private val log = LoggerFactory.getLogger(DocumentSigner::class.java)
     private val signingKey: PrivateKey
     private val signingCertificate: X509Certificate
     private val factory: XMLSignatureFactory = XMLSignatureFactory.getInstance("DOM")
@@ -42,21 +43,20 @@ class DocumentSigner(keystoreBase64: String, keystorePassword: CharArray, alias:
         signingKey = keyStore.getKey(alias, keystorePassword) as PrivateKey
         signingCertificate = keyStore.getCertificate(alias) as X509Certificate
 
-        println("Signing Certificate:")
-        println("  Subject DN: ${signingCertificate.subjectDN}")
-        println("  Issuer DN: ${signingCertificate.issuerDN}")
-        println("  Serial Number: ${signingCertificate.serialNumber}")
-        println("  Valid From: ${signingCertificate.notBefore}")
-        println("  Valid To: ${signingCertificate.notAfter}")
-        println("  Public Key: ${signingCertificate.publicKey}")
+        log.info("Signing Certificate:")
+        log.info("  Subject DN: ${signingCertificate.subjectDN}")
+        log.info("  Issuer DN: ${signingCertificate.issuerDN}")
+        log.info("  Serial Number: ${signingCertificate.serialNumber}")
+        log.info("  Valid From: ${signingCertificate.notBefore}")
+        log.info("  Valid To: ${signingCertificate.notAfter}")
+        log.info("  Public Key: ${signingCertificate.publicKey}")
     }
 
     fun signerXML(document: Document): Document {
         val signature = buildXmlSignature(signingCertificate)
         signature.sign(DOMSignContext(signingKey, document.documentElement))
-        return document.also {
-            LoggerFactory.getLogger("Document is being signed").info(it.asString())
-        }
+        log.info("Document is being signed")
+        return document
     }
 
     private fun buildXmlSignature(signerCertificate: X509Certificate): XMLSignature {
@@ -90,7 +90,7 @@ class DocumentSigner(keystoreBase64: String, keystorePassword: CharArray, alias:
 
     fun signDocument(document: Document, attachments: List<Payload>): Document {
         val keyInfo = createKeyInfo()
-        println("Signing EBXML ENVELOPE")
+        log.info("Signing EBXML envelope")
         val domSignContext = DOMSignContext(signingKey, document.documentElement)
         val defaultResolver = factory.uriDereferencer
         domSignContext.uriDereferencer = EbmsAttachmentURIDereferencer(attachments, defaultResolver)
