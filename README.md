@@ -2,15 +2,15 @@
 
 ## TLDR Commands
 
-| Command                                                                                                                   | Description                                     |
-|---------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
-| `./gradlew dev`                                                                                                           | Runs both the backend and frontend concurrently |
-| `./gradlew run`                                                                                                           | Runs only the Ktor backend                      |
-| `cd frontend && yarn dev`                                                                                                 | Runs only the Next.js frontend                  |
-| `docker build -t emottak-test-client .`                                                                                   | Build local docker image                        |
-| `docker run --name emottak-test-client-backend -p 8080:8080 -t emottak-test-client-backend -f backend/Dockerfile backend` | Run local docker image of backend               |
-| `docker run --name emottak-test-client -p 3000:3000 -t emottak-test-client -f frontend/Dockerfile frontend`               | Run local docker image of frontend              |
-| `docker rm -f emottak-test-client`                                                                                        | Forcefully stop and remove a container          |
+| Command                                                                                                                   | Description                                                        |
+|---------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| `./gradlew dev`                                                                                                           | Runs both the backend and frontend concurrently (requires ENVs set) |
+| `./gradlew run`                                                                                                           | Runs only the Ktor backend (requires ENVs set)                     |
+| `cd frontend && yarn dev`                                                                                                 | Runs only the Next.js frontend                                     |
+| `docker build -t emottak-test-client .`                                                                                   | Build local docker image                                           |
+| `docker run --name emottak-test-client-backend -p 8080:8080 -t emottak-test-client-backend -f backend/Dockerfile backend` | Run local docker image of backend (requires ENVs passed in)        |
+| `docker run --name emottak-test-client -p 3000:3000 -t emottak-test-client -f frontend/Dockerfile frontend`               | Run local docker image of frontend                                 |
+| `docker rm -f emottak-test-client`                                                                                        | Forcefully stop and remove a container                             |
 
 ## Running the Full Stack Application
 
@@ -22,6 +22,15 @@ To run both the backend and frontend concurrently in development mode with hot-r
 
 This command will start the Ktor backend and the Next.js frontend together. The backend will be accessible
 at http://localhost:8080, and the frontend will be accessible at http://localhost:3000
+
+## Required Envs
+
+| ENV | What     |
+| ----|----------|
+| VIRKSOMHETSSERTIFIKAT_SIGNERING | key      |
+| VIRKSOMHETSSERTIFIKAT_CREDENTIALS | password | 
+
+You can find these values in https://console.nav.cloud.nais.io under "Secrets" for the `emottak-test-client` app.
 
 ## Running the Backend
 
