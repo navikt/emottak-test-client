@@ -9,3 +9,7 @@ tasks.register("start") {
 tasks.register("dev") {
     dependsOn(":backend:run", ":frontend:devFrontend")
 }
+
+tasks.register("buildBackend") {
+    dependsOn(":backend:build")
+}
