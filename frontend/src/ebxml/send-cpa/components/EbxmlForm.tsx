@@ -17,6 +17,12 @@ import { githubLight } from "@uiw/codemirror-theme-github";
 import { generateKibanaURLFromConversationId } from "@/lib/generate-kibana-url";
 import { v4 as uuidv4 } from "uuid";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function EbxmlForm() {
   const [formData, setFormData] = useState(frikortEgenandelForesporselRequest);
@@ -218,31 +224,50 @@ export default function EbxmlForm() {
 
       <div ref={responseRef}>
         {response && (
-          <>
-            <div className="space-y-4">
-              <div className="bg-green-300 p-4 rounded-md  font-bold text-2xl flex justify-center">
+          <div>
+            <div className="rounded-md border border-border">
+              <div className="bg-green-200 text-green-900 p-3 text-center text-lg font-semibold rounded-t-md">
                 Success
               </div>
-              <div>
-                <a target="_blank" href={logsLink}>
+              <div className="px-4 py-2 border-t border-border text-sm text-muted-foreground">
+                <a target="_blank" href={logsLink} className="underline">
                   View Logs in Kibana
                 </a>
               </div>
-              <Label>DECODED:</Label>
-              <Alert variant="default">
-                <CodeMirror
-                  readOnly
-                  value={decodeResponse(response)}
-                  extensions={[xml()]}
-                  theme={githubLight}
-                />
-              </Alert>
-              RAW
-              <Alert variant="default">
-                <CodeMirror readOnly value={response} extensions={[xml()]} theme={githubLight} />
-              </Alert>
+
+              <Accordion type="multiple" defaultValue={["decoded"]}>
+                <AccordionItem value="decoded">
+                  <AccordionTrigger className="px-4 py-2 text-sm justify-center font-medium hover:bg-gray-200 bg-gray-100 h-full">
+                    Decoded Response
+                  </AccordionTrigger>
+                  <AccordionContent className="px-0 py-0">
+                    <CodeMirror
+                      readOnly
+                      value={decodeResponse(response)}
+                      extensions={[xml()]}
+                      theme={githubLight}
+                      className="rounded-md border"
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="raw">
+                  <AccordionTrigger className="px-4 py-2 text-sm justify-center font-medium hover:bg-gray-200 bg-gray-100 h-full">
+                    Raw Response
+                  </AccordionTrigger>
+                  <AccordionContent className="px-0 py-0">
+                    <CodeMirror
+                      readOnly
+                      value={response}
+                      extensions={[xml()]}
+                      theme={githubLight}
+                      className="rounded-md border"
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
-          </>
+          </div>
         )}
 
         {error && (
