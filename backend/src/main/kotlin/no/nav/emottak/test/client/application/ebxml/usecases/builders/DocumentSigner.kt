@@ -55,7 +55,7 @@ class DocumentSigner(keystoreBase64: String, keystorePassword: CharArray, alias:
         val signature = buildXmlSignature(signingCertificate)
         signature.sign(DOMSignContext(signingKey, document.documentElement))
         return document.also {
-            LoggerFactory.getLogger("Doc is being signed").info(it.asString())
+            LoggerFactory.getLogger("Document is being signed").info(it.asString())
         }
     }
 
