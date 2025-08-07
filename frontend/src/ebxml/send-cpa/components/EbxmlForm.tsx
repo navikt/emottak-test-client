@@ -23,6 +23,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { decodeResponse } from "@/lib/xml-formatter";
 
 export default function EbxmlForm() {
   const [formData, setFormData] = useState(frikortEgenandelForesporselRequest);
@@ -100,30 +101,7 @@ export default function EbxmlForm() {
     }
   };
 
-  const logsLink = generateKibanaURLFromConversationId(lastUsedConversationId);
-
-  const xmlFormatterOptions = { indentation: "  ", lineSeparator: "\n" };
-  const decodeResponse = (value: string) => {
-    return value
-      .split(/--------=/)
-      .flatMap((chunk) => chunk.split(/\r?\n\r?\n/))
-      .map((section) => {
-        try {
-          const line = section.trim();
-          if (line.length === 0) return section;
-          const decodedXml = atob(line);
-          return xmlFormatter(decodedXml, xmlFormatterOptions);
-        } catch {
-          try {
-            return xmlFormatter(section, xmlFormatterOptions);
-          } catch {
-            return section;
-          }
-        }
-      })
-      .filter((e) => e.length !== 0)
-      .join("\n\n");
-  };
+  const kibanaLogUrl = generateKibanaURLFromConversationId(lastUsedConversationId);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -230,7 +208,7 @@ export default function EbxmlForm() {
                 Success
               </div>
               <div className="px-4 py-2 border-t border-border text-sm text-muted-foreground">
-                <a target="_blank" href={logsLink} className="underline">
+                <a target="_blank" href={kibanaLogUrl} className="underline">
                   View Logs in Kibana
                 </a>
               </div>
@@ -277,7 +255,7 @@ export default function EbxmlForm() {
                 Error
               </div>
               <div>
-                <a target="_blank" href={logsLink}>
+                <a target="_blank" href={kibanaLogUrl}>
                   View Logs in Kibana
                 </a>
               </div>
