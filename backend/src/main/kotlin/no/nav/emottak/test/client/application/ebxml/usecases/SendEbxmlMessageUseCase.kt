@@ -150,7 +150,7 @@ data class EbxmlRequest(
     val messageId: String = UUID.randomUUID().toString(),
     val timestamp: String = Instant.now().toString(),
     val ebxmlPayload: EbxmlPayload? = null,
-    val signPayload: Boolean? = true
+    val signPayload: Boolean? = false
 )
 
 @Serializable

@@ -28,7 +28,7 @@ fun Routing.sendEbxmlMessageRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCa
 
             val result = sendEbxmlMessageUseCase.sendEbxmlMessage(ebxmlRequest)
 
-            log.debug("/ebxml/send-cpa is returning response: $result")
+            log.debug("/ebxml/send-cpa is returning response: {}", result)
 
             when (result) {
                 is EbxmlResult.Success -> {
@@ -75,6 +75,7 @@ data class EbxmlRequestDto(
             cpaId = cpaId,
             service = service,
             action = action,
+            signPayload = signPayload,
             ebxmlPayload = ebxmlPayload?.let {
                 EbxmlPayload(
                     base64Content = it.base64Content ?: "",
