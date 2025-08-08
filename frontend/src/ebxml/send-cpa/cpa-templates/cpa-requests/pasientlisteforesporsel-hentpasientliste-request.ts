@@ -3,7 +3,6 @@ import { EbxmlRequest } from "../../types";
 import { v4 as uuidv4 } from "uuid";
 
 export const pasientlisteForesporselHentPasientlisteRequest: EbxmlRequest = {
-  signPayload: false,
   conversationId: uuidv4().toString(),
   messageId: uuidv4().toString(),
   fromPartyId: "13579",
@@ -13,6 +12,7 @@ export const pasientlisteForesporselHentPasientlisteRequest: EbxmlRequest = {
   cpaId: "nav:qass:36666",
   service: "PasientlisteForesporsel",
   action: "HentPasientliste",
+  signPayload: false,
   ebxmlPayload: {
     base64Content: encodeXmlToBase64(
       `

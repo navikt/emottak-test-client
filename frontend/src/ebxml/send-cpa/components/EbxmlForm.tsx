@@ -3,7 +3,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert } from "@/components/ui/alert";
-import xmlFormatter from "xml-formatter";
 import React, { useRef, useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
 import { EbxmlResult, sendEbxmlRequest } from "@/ebxml/send-cpa/actions/send-request";
@@ -47,8 +46,8 @@ export default function EbxmlForm() {
       toRole: "",
       service: "",
       action: "",
-      ebxmlPayload: { base64Content: "" },
       signPayload: false,
+      ebxmlPayload: { base64Content: "" },
     });
     setError(null);
     setResponse(null);
@@ -195,10 +194,25 @@ export default function EbxmlForm() {
           onChange={(value) => handlePayloadChange(value)}
         />
       </div>
-      <Button type="submit" disabled={loading} variant={"outline"} className="bg-green-100">
-        {loading && <Loader2 className="animate-spin w-5 h-5" />}
-        {loading ? "Sending..." : "Send Request"}
-      </Button>
+      <div className="flex items-center gap-4">
+        <Button type="submit" disabled={loading} variant={"outline"} className="bg-green-100">
+          {loading && <Loader2 className="animate-spin w-5 h-5" />}
+          {loading ? "Sending..." : "Send Request"}
+        </Button>
+
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="signPayload"
+            checked={formData.signPayload}
+            onCheckedChange={(checked) =>
+              setFormData((prev) => ({ ...prev, signPayload: !!checked }))
+            }
+          />
+          <Label htmlFor="signPayload" className="select-none cursor-pointer">
+            Sign payload
+          </Label>
+        </div>
+      </div>
 
       <div ref={responseRef}>
         {response && (

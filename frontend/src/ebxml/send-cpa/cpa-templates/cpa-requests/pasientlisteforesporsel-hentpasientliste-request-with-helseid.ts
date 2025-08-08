@@ -12,6 +12,7 @@ export const pasientlisteForesporselHentPasientlisteWithHelseIdRequest: EbxmlReq
   cpaId: "nav:qass:36666",
   service: "PasientlisteForesporsel",
   action: "HentPasientliste",
+  signPayload: true,
   ebxmlPayload: {
     base64Content: encodeXmlToBase64(
       `
@@ -105,5 +106,4 @@ export const pasientlisteForesporselHentPasientlisteWithHelseIdRequest: EbxmlReq
       `.trim()
     ),
   },
-  signPayload: false,
 };

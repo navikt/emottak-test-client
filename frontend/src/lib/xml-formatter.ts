@@ -1,3 +1,5 @@
+import xmlFormatter from "xml-formatter";
+
 const xmlFormatterOptions = { indentation: "  ", lineSeparator: "\n" };
 export const decodeResponse = (value: string) => {
   return value
