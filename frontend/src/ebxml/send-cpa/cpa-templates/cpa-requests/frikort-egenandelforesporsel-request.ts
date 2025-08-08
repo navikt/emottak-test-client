@@ -12,7 +12,7 @@ export const frikortEgenandelForesporselRequest: EbxmlRequest = {
   cpaId: "nav:qass:36666",
   service: "HarBorgerFrikort",
   action: "EgenandelForesporsel",
-  signPayload: false,
+  signPayload: true,
   ebxmlPayload: {
     base64Content: encodeXmlToBase64(
       `
