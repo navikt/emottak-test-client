@@ -1,6 +1,9 @@
 import { frikortEgenandelForesporselRequest } from "@/ebxml/send-cpa/cpa-templates/cpa-requests/frikort-egenandelforesporsel-request";
 import { pasientlisteForesporselHentPasientlisteRequest } from "@/ebxml/send-cpa/cpa-templates/cpa-requests/pasientlisteforesporsel-hentpasientliste-request";
 import { EbxmlRequest } from "@/ebxml/send-cpa/types";
+import {
+  pasientlisteForesporselHentPasientlisteWithHelseIdRequest
+} from "@/ebxml/send-cpa/cpa-templates/cpa-requests/pasientlisteforesporsel-hentpasientliste-request-with-helseid";
 
 export type CpaRequestTemplate = {
   type: string;
@@ -18,5 +21,10 @@ export const cpaRequestTemplates: CpaRequestTemplate[] = [
     type: "Pasientliste",
     name: "HentPasientliste",
     value: pasientlisteForesporselHentPasientlisteRequest,
+  },
+  {
+    type: "Pasientliste",
+    name: "HentPasientliste med HelseID",
+    value: pasientlisteForesporselHentPasientlisteWithHelseIdRequest,
   },
 ];

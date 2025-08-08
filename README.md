@@ -32,6 +32,16 @@ at http://localhost:8080, and the frontend will be accessible at http://localhos
 
 You can find these values in https://console.nav.cloud.nais.io under "Secrets" for the `emottak-test-client` app.
 
+## Better Logging for local development
+
+Add the following ENVs:
+
+| ENV           | What                    | Why   |
+|---------------|-------------------------|-------| 
+| LOCAL_LOGGING | boolean | This will change logging to a readable format (not JSON) |
+| EMOTTAK_LOGGING_LEVEL | "DEBUG", "INFO", etc | Recommend setting this to DEBUG for local development |
+
+
 ## Running the Backend
 
 To run the backend only, use the following command:

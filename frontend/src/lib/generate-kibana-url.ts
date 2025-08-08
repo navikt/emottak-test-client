@@ -59,12 +59,12 @@ export function generateKibanaURLFromConversationId(conversationId: string) {
 
   const _g = {
     filters: [],
-    refreshInterval: { pause: false, value: 5000 },
+    refreshInterval: { pause: false, value: 30000 },
     time: { from: "now-15h", to: "now" },
   };
 
   const _a = {
-    columns: ["exception", "message"],
+    columns: ["container.name", "exception", "message"],
     dataSource: { dataViewId: "96e648c0-980a-11e9-830a-e17bbd64b4db", type: "dataView" },
     filters: [
       {

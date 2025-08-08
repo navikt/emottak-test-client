@@ -10,39 +10,23 @@ import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
+import io.ktor.util.encodeBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import no.nav.emottak.test.client.application.ebxml.usecases.builders.EbxmlDocumentBuilder
 import no.nav.emottak.test.client.domain.EbxmlResult
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
+import no.nav.emottak.test.client.infrastructure.utils.asXmlString
 import no.nav.emottak.test.client.infrastructure.xml.xmlMarshaller
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.UUID
 
-@Serializable
-data class EbxmlRequest(
-    val fromPartyId: String,
-    val fromRole: String,
-    val toPartyId: String,
-    val toRole: String,
-    val cpaId: String,
-    val conversationId: String = UUID.randomUUID().toString(),
-    val service: String,
-    val action: String,
-    val messageId: String = UUID.randomUUID().toString(),
-    val timestamp: String = Instant.now().toString(),
-    val ebxmlPayload: EbxmlPayload? = null
-)
-
-@Serializable
-data class EbxmlPayload(
-    val base64Content: String,
-    val contentId: String = "${UUID.randomUUID()}@emottak-test-payload.nav.no"
-)
-
-class SendEbxmlMessageUseCase(private val applicationConfig: ApplicationConfig, private val httpClient: HttpClient) {
+class SendEbxmlMessageUseCase(
+    private val applicationConfig: ApplicationConfig,
+    private val httpClient: HttpClient
+) {
 
     private val log = LoggerFactory.getLogger(SendEbxmlMessageUseCase::class.java)
 
@@ -56,7 +40,7 @@ class SendEbxmlMessageUseCase(private val applicationConfig: ApplicationConfig, 
 
             val soapMessageContentId = "<${UUID.randomUUID()}@emottak-test.nav.no>"
 
-            val base64Payload = requestDto.ebxmlPayload?.base64Content
+            val base64Payload = String(builder.payload!!.bytes).encodeBase64()
             val payloadContentId = "<${requestDto.ebxmlPayload?.contentId}>"
 
             val boundary = UUID.randomUUID().toString()
@@ -78,21 +62,28 @@ class SendEbxmlMessageUseCase(private val applicationConfig: ApplicationConfig, 
                     )
                 )
 
-                if (base64Payload != null) {
-                    partData.add(
-                        PartData.FormItem(
-                            base64Payload,
-                            {},
-                            Headers.build {
-                                append("Content-Type", "text/xml; charset=utf-8")
-                                append("Content-Id", payloadContentId)
-                                append("Content-Transfer-Encoding", "base64")
-                            }
-                        )
+                partData.add(
+                    PartData.FormItem(
+                        base64Payload,
+                        {},
+                        Headers.build {
+                            append("Content-Type", "text/xml; charset=utf-8")
+                            append("Content-Id", payloadContentId)
+                            append("Content-Transfer-Encoding", "base64")
+                        }
                     )
-                }
+                )
 
                 val url = applicationConfig.ebmsSyncRouterUrl
+
+                val bodyContent = MultiPartFormDataContent(
+                    partData,
+                    boundary,
+                    ContentType.parse(contentType)
+                )
+
+                val outboundMultipart: String = bodyContent.asXmlString()
+                log.error("Sending EBXML message {}", outboundMultipart)
 
                 val response = withContext(Dispatchers.IO) {
                     httpClient.post(url) {
@@ -100,29 +91,24 @@ class SendEbxmlMessageUseCase(private val applicationConfig: ApplicationConfig, 
                             append("Content-Type", contentType)
                             append("SOAPAction", "ebXML")
                             append("MIME-Version", "1.0")
-                            append("X_SEND_TO", "ny")
+                            append("X_SEND_TO", "ny") // Forces eMottak forwarding to new eMottak flow
                             append("Message-Id", requestDto.messageId)
                             append("Accept", "*/*")
                         }
-                        setBody(
-                            MultiPartFormDataContent(
-                                partData,
-                                boundary,
-                                ContentType.parse(contentType)
-                            )
-                        )
+                        setBody(bodyContent)
                     }
                 }
 
                 val responseBody = response.bodyAsText()
                 if (response.status == HttpStatusCode.OK) {
                     log.info("Successfully sent ebXML request")
-                    EbxmlResult.Success(responseBody)
+                    EbxmlResult.Success(responseBody, outboundMultipart)
                 } else {
                     log.error("Failed request with status: ${response.status}")
                     EbxmlResult.Failure(
                         "Unexpected status code: ${response.status} and response: ${response.bodyAsText()}",
-                        response.status.value
+                        response.status.value,
+                        outboundMultipart
                     )
                 }
             } catch (e: Exception) {
@@ -155,3 +141,25 @@ class SendEbxmlMessageUseCase(private val applicationConfig: ApplicationConfig, 
         }
     }
 }
+
+@Serializable
+data class EbxmlRequest(
+    val fromPartyId: String,
+    val fromRole: String,
+    val toPartyId: String,
+    val toRole: String,
+    val cpaId: String,
+    val conversationId: String = UUID.randomUUID().toString(),
+    val service: String,
+    val action: String,
+    val messageId: String = UUID.randomUUID().toString(),
+    val timestamp: String = Instant.now().toString(),
+    val ebxmlPayload: EbxmlPayload? = null,
+    val signPayload: Boolean? = false
+)
+
+@Serializable
+data class EbxmlPayload(
+    val base64Content: String,
+    val contentId: String = "${UUID.randomUUID()}@emottak-test-payload.nav.no"
+)
