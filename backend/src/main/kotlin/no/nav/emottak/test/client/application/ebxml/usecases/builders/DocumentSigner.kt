@@ -2,7 +2,6 @@ package no.nav.emottak.test.client.application.ebxml.usecases.builders
 
 import no.nav.emottak.test.client.domain.Payload
 import no.nav.emottak.test.client.infrastructure.xml.EbmsAttachmentURIDereferencer
-import no.nav.emottak.test.client.infrastructure.xml.asString
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
