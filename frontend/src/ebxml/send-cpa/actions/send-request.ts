@@ -4,8 +4,8 @@ import { EbxmlRequest } from "@/ebxml/send-cpa/types";
 import { config } from "@/infrastructure/config/config";
 
 export type EbxmlResult =
-  | { type: "Success"; message: string }
-  | { type: "Failure"; error: string; statusCode?: number };
+  | { type: "Success"; message: string; outboundXml: string }
+  | { type: "Failure"; error: string; statusCode?: number; outboundXml?: string };
 
 export async function sendEbxmlRequest(ebxmlRequest: EbxmlRequest): Promise<EbxmlResult> {
   const result = await fetch(`${config.testClientBackendBaseUrl}/ebxml/send-cpa`, {
@@ -20,10 +20,19 @@ export async function sendEbxmlRequest(ebxmlRequest: EbxmlRequest): Promise<Ebxm
 
   if (result.ok) {
     if ("message" in responseBody) {
-      return { type: "Success", message: responseBody.message };
+      return {
+        type: "Success",
+        message: responseBody.message,
+        outboundXml: responseBody.outboundXml,
+      };
     }
     throw new Error("Unexpected response structure for Success response");
   }
   const errorMessage = responseBody.error || "Unknown error";
-  return { type: "Failure", error: errorMessage, statusCode: result.status };
+  return {
+    type: "Failure",
+    error: errorMessage,
+    statusCode: result.status,
+    outboundXml: responseBody.outboundXml ?? null,
+  };
 }

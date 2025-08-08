@@ -17,6 +17,7 @@ import kotlinx.serialization.Serializable
 import no.nav.emottak.test.client.application.ebxml.usecases.builders.EbxmlDocumentBuilder
 import no.nav.emottak.test.client.domain.EbxmlResult
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
+import no.nav.emottak.test.client.infrastructure.utils.asXmlString
 import no.nav.emottak.test.client.infrastructure.xml.xmlMarshaller
 import org.slf4j.LoggerFactory
 import java.time.Instant
@@ -75,6 +76,15 @@ class SendEbxmlMessageUseCase(
 
                 val url = applicationConfig.ebmsSyncRouterUrl
 
+                val bodyContent = MultiPartFormDataContent(
+                    partData,
+                    boundary,
+                    ContentType.parse(contentType)
+                )
+
+                val outboundMultipart: String = bodyContent.asXmlString()
+                log.error("Sending EBXML message {}", outboundMultipart)
+
                 val response = withContext(Dispatchers.IO) {
                     httpClient.post(url) {
                         headers {
@@ -85,25 +95,20 @@ class SendEbxmlMessageUseCase(
                             append("Message-Id", requestDto.messageId)
                             append("Accept", "*/*")
                         }
-                        setBody(
-                            MultiPartFormDataContent(
-                                partData,
-                                boundary,
-                                ContentType.parse(contentType)
-                            )
-                        )
+                        setBody(bodyContent)
                     }
                 }
 
                 val responseBody = response.bodyAsText()
                 if (response.status == HttpStatusCode.OK) {
                     log.info("Successfully sent ebXML request")
-                    EbxmlResult.Success(responseBody)
+                    EbxmlResult.Success(responseBody, outboundMultipart)
                 } else {
                     log.error("Failed request with status: ${response.status}")
                     EbxmlResult.Failure(
                         "Unexpected status code: ${response.status} and response: ${response.bodyAsText()}",
-                        response.status.value
+                        response.status.value,
+                        outboundMultipart
                     )
                 }
             } catch (e: Exception) {

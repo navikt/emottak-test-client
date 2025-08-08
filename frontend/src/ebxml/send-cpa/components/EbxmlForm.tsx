@@ -22,7 +22,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { decodeResponse } from "@/lib/xml-formatter";
+import { decodeMultipart } from "@/lib/xml-formatter";
 
 export default function EbxmlForm() {
   const [formData, setFormData] = useState(frikortEgenandelForesporselRequest);
@@ -32,6 +32,7 @@ export default function EbxmlForm() {
   const [autoReloadConversationId, setAutoReloadConversationId] = useState(true);
   const [autoReloadMessageId, setAutoReloadMessageId] = useState(true);
   const [lastUsedConversationId, setLastUsedConversationId] = useState("");
+  const [outboundXml, setOutboundXml] = useState<string | null>(null);
 
   const responseRef = useRef<HTMLDivElement | null>(null);
 
@@ -51,6 +52,7 @@ export default function EbxmlForm() {
     });
     setError(null);
     setResponse(null);
+    setOutboundXml(null);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -83,6 +85,7 @@ export default function EbxmlForm() {
         setError(result.error);
       }
 
+      setOutboundXml(result.outboundXml ?? null);
       setLastUsedConversationId(formData.conversationId);
 
       setFormData((prev) => ({
@@ -228,14 +231,31 @@ export default function EbxmlForm() {
               </div>
 
               <Accordion type="multiple" defaultValue={["decoded"]}>
+                {outboundXml && (
+                  <AccordionItem value="outbound">
+                    <AccordionTrigger className="px-4 py-2 text-sm justify-center font-medium hover:bg-gray-200 bg-gray-100 h-full">
+                      Request
+                    </AccordionTrigger>
+                    <AccordionContent className="px-0 py-0">
+                      <CodeMirror
+                        readOnly
+                        value={decodeMultipart(outboundXml)}
+                        extensions={[xml()]}
+                        theme={githubLight}
+                        className="rounded-md border"
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+
                 <AccordionItem value="decoded">
                   <AccordionTrigger className="px-4 py-2 text-sm justify-center font-medium hover:bg-gray-200 bg-gray-100 h-full">
-                    Decoded Response
+                    Response
                   </AccordionTrigger>
                   <AccordionContent className="px-0 py-0">
                     <CodeMirror
                       readOnly
-                      value={decodeResponse(response)}
+                      value={decodeMultipart(response)}
                       extensions={[xml()]}
                       theme={githubLight}
                       className="rounded-md border"
