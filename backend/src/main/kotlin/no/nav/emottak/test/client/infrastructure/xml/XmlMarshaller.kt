@@ -28,21 +28,7 @@ class XmlMarshaller {
         )
 
         private val marshaller = jaxbContext.createMarshaller()
-        private val unmarshaller = jaxbContext.createUnmarshaller()
         private val marshlingMonitor = Any()
-        private val unmarshlingMonitor = Any()
-    }
-
-    fun marshal(objekt: Any): String {
-        val writer = StringWriter()
-        synchronized(marshlingMonitor) {
-            marshaller.marshal(objekt, writer)
-        }
-        return writer.toString()
-    }
-
-    fun unmarshal(byteArray: ByteArray): Document {
-        return xmlMarshaller.unmarshal(String(byteArray), Document::class.java)
     }
 
     fun marshal(envelope: Envelope): Document {
@@ -64,12 +50,5 @@ class XmlMarshaller {
         val source = DOMSource(document)
         transformer.transform(source, output)
         return output.writer.toString().replace("&#13;", "").replace("\r\n", "").replace("\n", "")
-    }
-
-    fun <T> unmarshal(xml: String, clazz: Class<T>): T {
-        val reader = XMLInputFactory.newInstance().createXMLStreamReader(xml.reader())
-        return synchronized(unmarshlingMonitor) {
-            unmarshaller.unmarshal(reader, clazz).value
-        }
     }
 }

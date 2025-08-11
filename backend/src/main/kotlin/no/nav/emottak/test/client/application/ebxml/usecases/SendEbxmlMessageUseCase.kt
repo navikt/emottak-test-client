@@ -83,7 +83,7 @@ class SendEbxmlMessageUseCase(
                 )
 
                 val outboundMultipart: String = bodyContent.asXmlString()
-                log.error("Sending EBXML message {}", outboundMultipart)
+                log.debug("Sending EBXML message {}", outboundMultipart)
 
                 val response = withContext(Dispatchers.IO) {
                     httpClient.post(url) {
@@ -91,7 +91,7 @@ class SendEbxmlMessageUseCase(
                             append("Content-Type", contentType)
                             append("SOAPAction", "ebXML")
                             append("MIME-Version", "1.0")
-                            append("X_SEND_TO", "ny") // Forces eMottak forwarding to new eMottak flow
+                            append("X_SEND_TO", "ny") // TODO: Lag toggle for dette i FE. Forces eMottak forwarding to new eMottak flow
                             append("Message-Id", requestDto.messageId)
                             append("Accept", "*/*")
                         }
