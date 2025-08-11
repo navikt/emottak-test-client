@@ -2,6 +2,7 @@ package no.nav.emottak.test.client.infrastructure.utils
 
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.utils.io.ByteChannel
+import io.ktor.utils.io.readAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

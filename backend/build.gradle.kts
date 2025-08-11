@@ -67,6 +67,13 @@ dependencies {
     implementation("com.sksamuel.hoplite:hoplite-yaml:2.8.2")
     implementation("org.codehaus.janino:janino:3.1.6")
 
+    implementation("io.arrow-kt:arrow-core:2.1.0")
+    implementation("io.arrow-kt:arrow-fx-coroutines:2.1.0")
+    implementation("io.arrow-kt:suspendapp:2.1.0")
+    implementation("io.arrow-kt:suspendapp-ktor:2.1.0")
+
+    implementation("no.nav.emottak:emottak-utils:0.3.2")
+
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
