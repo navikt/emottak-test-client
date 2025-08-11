@@ -16,6 +16,13 @@ import { githubLight } from "@uiw/codemirror-theme-github";
 import { generateKibanaURLFromConversationId } from "@/lib/generate-kibana-url";
 import { v4 as uuidv4 } from "uuid";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { decodeMultipart } from "@/lib/xml-formatter";
 
 export default function EbxmlForm() {
   const [formData, setFormData] = useState(frikortEgenandelForesporselRequest);
@@ -25,6 +32,7 @@ export default function EbxmlForm() {
   const [autoReloadConversationId, setAutoReloadConversationId] = useState(true);
   const [autoReloadMessageId, setAutoReloadMessageId] = useState(true);
   const [lastUsedConversationId, setLastUsedConversationId] = useState("");
+  const [outboundXml, setOutboundXml] = useState<string | null>(null);
 
   const responseRef = useRef<HTMLDivElement | null>(null);
 
@@ -39,10 +47,12 @@ export default function EbxmlForm() {
       toRole: "",
       service: "",
       action: "",
+      signPayload: false,
       ebxmlPayload: { base64Content: "" },
     });
     setError(null);
     setResponse(null);
+    setOutboundXml(null);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -75,6 +85,7 @@ export default function EbxmlForm() {
         setError(result.error);
       }
 
+      setOutboundXml(result.outboundXml ?? null);
       setLastUsedConversationId(formData.conversationId);
 
       setFormData((prev) => ({
@@ -92,7 +103,7 @@ export default function EbxmlForm() {
     }
   };
 
-  const logsLink = generateKibanaURLFromConversationId(lastUsedConversationId);
+  const kibanaLogUrl = generateKibanaURLFromConversationId(lastUsedConversationId);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -186,28 +197,89 @@ export default function EbxmlForm() {
           onChange={(value) => handlePayloadChange(value)}
         />
       </div>
-      <Button type="submit" disabled={loading} variant={"outline"} className="bg-green-100">
-        {loading && <Loader2 className="animate-spin w-5 h-5" />}
-        {loading ? "Sending..." : "Send Request"}
-      </Button>
+      <div className="flex items-center gap-4">
+        <Button type="submit" disabled={loading} variant={"outline"} className="bg-green-100">
+          {loading && <Loader2 className="animate-spin w-5 h-5" />}
+          {loading ? "Sending..." : "Send Request"}
+        </Button>
+
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="signPayload"
+            checked={formData.signPayload}
+            onCheckedChange={(checked) =>
+              setFormData((prev) => ({ ...prev, signPayload: !!checked }))
+            }
+          />
+          <Label htmlFor="signPayload" className="select-none cursor-pointer">
+            Sign payload
+          </Label>
+        </div>
+      </div>
 
       <div ref={responseRef}>
         {response && (
-          <>
-            <div className="space-y-4">
-              <div className="bg-green-300 p-4 rounded-md  font-bold text-2xl flex justify-center">
+          <div>
+            <div className="rounded-md border border-border">
+              <div className="bg-green-200 text-green-900 p-3 text-center text-lg font-semibold rounded-t-md">
                 Success
               </div>
-              <div>
-                <a target="_blank" href={logsLink}>
+              <div className="px-4 py-2 border-t border-border text-sm text-muted-foreground">
+                <a target="_blank" href={kibanaLogUrl} className="underline">
                   View Logs in Kibana
                 </a>
               </div>
-              <Alert variant="default">
-                <CodeMirror readOnly value={response} extensions={[xml()]} theme={githubLight} />
-              </Alert>
+
+              <Accordion type="multiple" defaultValue={["decoded"]}>
+                {outboundXml && (
+                  <AccordionItem value="outbound">
+                    <AccordionTrigger className="px-4 py-2 text-sm justify-center font-medium hover:bg-gray-200 bg-gray-100 h-full">
+                      Request
+                    </AccordionTrigger>
+                    <AccordionContent className="px-0 py-0">
+                      <CodeMirror
+                        readOnly
+                        value={decodeMultipart(outboundXml)}
+                        extensions={[xml()]}
+                        theme={githubLight}
+                        className="rounded-md border"
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+
+                <AccordionItem value="decoded">
+                  <AccordionTrigger className="px-4 py-2 text-sm justify-center font-medium hover:bg-gray-200 bg-gray-100 h-full">
+                    Response
+                  </AccordionTrigger>
+                  <AccordionContent className="px-0 py-0">
+                    <CodeMirror
+                      readOnly
+                      value={decodeMultipart(response)}
+                      extensions={[xml()]}
+                      theme={githubLight}
+                      className="rounded-md border"
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="raw">
+                  <AccordionTrigger className="px-4 py-2 text-sm justify-center font-medium hover:bg-gray-200 bg-gray-100 h-full">
+                    Raw Response
+                  </AccordionTrigger>
+                  <AccordionContent className="px-0 py-0">
+                    <CodeMirror
+                      readOnly
+                      value={response}
+                      extensions={[xml()]}
+                      theme={githubLight}
+                      className="rounded-md border"
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
-          </>
+          </div>
         )}
 
         {error && (
@@ -217,7 +289,7 @@ export default function EbxmlForm() {
                 Error
               </div>
               <div>
-                <a target="_blank" href={logsLink}>
+                <a target="_blank" href={kibanaLogUrl}>
                   View Logs in Kibana
                 </a>
               </div>

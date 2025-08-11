@@ -48,6 +48,10 @@ nav {
   @apply max-w-6xl mx-auto my-12 px-4;
 }
 
+div[role="alert"] {
+  margin-top: 0;
+}
+
 h1 {
   line-height: 1.2;
   @apply scroll-m-20 font-extrabold tracking-tight text-4xl lg:text-5xl mb-8 mt-16;

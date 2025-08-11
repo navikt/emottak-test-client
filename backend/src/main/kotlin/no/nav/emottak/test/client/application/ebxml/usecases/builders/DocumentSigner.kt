@@ -3,6 +3,7 @@ package no.nav.emottak.test.client.application.ebxml.usecases.builders
 import no.nav.emottak.test.client.domain.Payload
 import no.nav.emottak.test.client.infrastructure.xml.EbmsAttachmentURIDereferencer
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
 import java.security.KeyStore
 import java.security.PrivateKey
@@ -13,6 +14,7 @@ import javax.xml.crypto.XMLStructure
 import javax.xml.crypto.dom.DOMStructure
 import javax.xml.crypto.dsig.SignedInfo
 import javax.xml.crypto.dsig.Transform
+import javax.xml.crypto.dsig.XMLSignature
 import javax.xml.crypto.dsig.XMLSignatureFactory
 import javax.xml.crypto.dsig.dom.DOMSignContext
 import javax.xml.crypto.dsig.keyinfo.KeyInfo
@@ -21,8 +23,9 @@ import javax.xml.crypto.dsig.keyinfo.X509Data
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec
 import javax.xml.crypto.dsig.spec.TransformParameterSpec
 
-class PayloadSigner(keystoreBase64: String, keystorePassword: CharArray, alias: String) {
+class DocumentSigner(keystoreBase64: String, keystorePassword: CharArray, alias: String) {
 
+    private val log = LoggerFactory.getLogger(DocumentSigner::class.java)
     private val signingKey: PrivateKey
     private val signingCertificate: X509Certificate
     private val factory: XMLSignatureFactory = XMLSignatureFactory.getInstance("DOM")
@@ -39,17 +42,54 @@ class PayloadSigner(keystoreBase64: String, keystorePassword: CharArray, alias: 
         signingKey = keyStore.getKey(alias, keystorePassword) as PrivateKey
         signingCertificate = keyStore.getCertificate(alias) as X509Certificate
 
-        println("Signing Certificate:")
-        println("  Subject DN: ${signingCertificate.subjectDN}")
-        println("  Issuer DN: ${signingCertificate.issuerDN}")
-        println("  Serial Number: ${signingCertificate.serialNumber}")
-        println("  Valid From: ${signingCertificate.notBefore}")
-        println("  Valid To: ${signingCertificate.notAfter}")
-        println("  Public Key: ${signingCertificate.publicKey}")
+        log.info("Signing Certificate:")
+        log.info("  Subject DN: ${signingCertificate.subjectDN}")
+        log.info("  Issuer DN: ${signingCertificate.issuerDN}")
+        log.info("  Serial Number: ${signingCertificate.serialNumber}")
+        log.info("  Valid From: ${signingCertificate.notBefore}")
+        log.info("  Valid To: ${signingCertificate.notAfter}")
+        log.info("  Public Key: ${signingCertificate.publicKey}")
+    }
+
+    fun signerXML(document: Document): Document {
+        val signature = buildXmlSignature(signingCertificate)
+        signature.sign(DOMSignContext(signingKey, document.documentElement))
+        log.info("Document is being signed")
+        return document
+    }
+
+    private fun buildXmlSignature(signerCertificate: X509Certificate): XMLSignature {
+        val keyInfoFactory = factory.keyInfoFactory
+        val x509Content: MutableList<Any?> = ArrayList()
+        x509Content.add(signerCertificate)
+        val x509data = keyInfoFactory.newX509Data(x509Content)
+        val keyInfo = keyInfoFactory.newKeyInfo(listOf(x509data))
+        val signature = factory.newXMLSignature(createSignedInfo(), keyInfo)
+        return signature
+    }
+
+    private fun createSignedInfo(): SignedInfo {
+        return factory.newSignedInfo(
+            factory.newCanonicalizationMethod(
+                canonicalizationMethod,
+                null as C14NMethodParameterSpec?
+            ),
+            factory.newSignatureMethod(signatureAlgorithm, null),
+            listOf(
+                factory.newReference(
+                    "",
+                    factory.newDigestMethod(digestAlgorithm, null),
+                    listOf(factory.newTransform(Transform.ENVELOPED, null as TransformParameterSpec?)),
+                    null,
+                    null
+                )
+            )
+        )
     }
 
     fun signDocument(document: Document, attachments: List<Payload>): Document {
         val keyInfo = createKeyInfo()
+        log.info("Signing EBXML envelope")
         val domSignContext = DOMSignContext(signingKey, document.documentElement)
         val defaultResolver = factory.uriDereferencer
         domSignContext.uriDereferencer = EbmsAttachmentURIDereferencer(attachments, defaultResolver)

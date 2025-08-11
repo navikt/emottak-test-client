@@ -1,8 +1,12 @@
 package no.nav.emottak.test.client.application.ebxml.usecases.builders
 
 import no.nav.emottak.test.client.application.ebxml.usecases.EbxmlRequest
+import no.nav.emottak.test.client.domain.Payload
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
+import no.nav.emottak.test.client.infrastructure.xml.asByteArray
 import no.nav.emottak.test.client.infrastructure.xml.xmlMarshaller
+import org.apache.xml.security.signature.XMLSignature
+import org.apache.xml.security.utils.Constants
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.From
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageData
@@ -12,24 +16,60 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To
+import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.NodeList
 import org.xmlsoap.schemas.soap.envelope.Body
 import org.xmlsoap.schemas.soap.envelope.Envelope
 import org.xmlsoap.schemas.soap.envelope.Header
 import java.text.SimpleDateFormat
+import java.util.Base64
 import java.util.Date
 import javax.xml.namespace.QName
+import javax.xml.parsers.DocumentBuilderFactory
 
 class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, private val requestDto: EbxmlRequest) {
 
-    private val payloadSigner = PayloadSigner(
-        applicationConfig.signing.key,
-        applicationConfig.signing.password.toCharArray(),
-        applicationConfig.alias
+    init {
+        org.apache.xml.security.Init.init()
+    }
+
+    private val log = LoggerFactory.getLogger(EbxmlDocumentBuilder::class.java)
+    private val documentSigner = DocumentSigner(
+        applicationConfig.signing.key, applicationConfig.signing.password.toCharArray(), applicationConfig.alias
     )
 
-    private val payload = requestDto.ebxmlPayload?.let {
-        PayloadBuilder().buildPayload(it)
+    fun ByteArray.asDocument(): Document {
+        val factory = DocumentBuilderFactory.newInstance()
+        factory.isNamespaceAware = true
+        val docBuilder = factory.newDocumentBuilder()
+        return docBuilder.parse(this.inputStream())
+    }
+
+    val payload: Payload? = requestDto.let {
+        if (it.ebxmlPayload == null) return@let null
+        log.info("Signing Payload")
+        var payloadAsBytes: ByteArray = Base64.getDecoder().decode(it.ebxmlPayload.base64Content.trim())
+        if (it.signPayload == true) {
+            payloadAsBytes = DocumentBuilderFactory.newInstance()
+                .apply { isNamespaceAware = true }
+                .newDocumentBuilder()
+                .parse(payloadAsBytes.inputStream())
+                .let { doc -> documentSigner.signerXML(doc).asByteArray() }
+        }
+        with(payloadAsBytes.asDocument().retrieveSignatureElement()) {
+            checkSignatureValue(keyInfo.x509Certificate)
+        }
+        val contentId = if (it.ebxmlPayload.contentId.startsWith("cid:")) {
+            it.ebxmlPayload.contentId
+        } else {
+            "cid:${it.ebxmlPayload.contentId}"
+        }
+
+        return@let Payload(
+            bytes = payloadAsBytes, contentType = "application/xml", contentId = contentId
+        )
     }
 
     fun buildAndSign(): Document {
@@ -37,12 +77,25 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
         val document = xmlMarshaller.marshal(envelope)
 
         val canonicalizedXml = xmlMarshaller.documentToString(document)
-        println("Canonicalized XML:\n$canonicalizedXml")
+        log.debug("Canonicalized XML:\n$canonicalizedXml")
 
         val attachments = listOfNotNull(payload)
-        val signedDocument = payloadSigner.signDocument(document, attachments)
+        val signedDocument = documentSigner.signDocument(document, attachments)
         insertSignatureIntoHeader(signedDocument)
+
         return signedDocument
+    }
+
+    /**
+     * Validerer signatur ifølge "Validering av ebXML-meldinger" 5.10.1
+     */
+    fun Document.retrieveSignatureElement(): XMLSignature {
+        val nodeList: NodeList = this.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE)
+        // Regel ID 52: Mer enn ett Signature-element
+        // Regel ID 45: Signature mangler i SOAP:Header
+        if (nodeList.length != 1) throw RuntimeException("${nodeList.length} signaturer i dokumentet! Skal være nøyaktig 1")
+        // Regel ID 363, 42, 32: Mangler SignedInfo, SignatureValue eller KeyInfo
+        return XMLSignature(nodeList.item(0) as Element, Constants.SignatureSpecNS)
     }
 
     fun buildEnvelope(): Envelope {
@@ -71,8 +124,7 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
                                 PartyId().apply {
                                     type = "HER"
                                     value = requestDto.fromPartyId
-                                }
-                            )
+                                })
                             role = requestDto.fromRole
                         }
                         to = To().apply {
@@ -80,8 +132,7 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
                                 PartyId().apply {
                                     type = "HER"
                                     value = requestDto.toPartyId
-                                }
-                            )
+                                })
                             role = requestDto.toRole
                         }
                         cpaId = requestDto.cpaId
@@ -95,16 +146,14 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
                             messageId = requestDto.messageId
                             timestamp = parsedDate
                         }
-                    }
-                )
+                    })
 
                 any.add(
                     SyncReply().apply {
                         this.isMustUnderstand = true
                         this.actor = "http://schemas.xmlsoap.org/soap/actor/next"
                         version = "2.0"
-                    }
-                )
+                    })
             }
             body = Body().apply {
                 xmlMarshaller
@@ -116,23 +165,20 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
                                 Reference().apply {
                                     type = "simple"
                                     href = "cid:$payloadContentId"
-                                }
-                            )
-                        }
-                    )
+                                })
+                        })
                 }
             }
         }
     }
 
     private fun insertSignatureIntoHeader(document: Document) {
-        val headerNode = document.documentElement
-            .getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Header")
-            .item(0)
+        val headerNode =
+            document.documentElement.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Header")
+                .item(0)
 
-        val signatureElement = document.documentElement
-            .getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature")
-            .item(0)
+        val signatureElement =
+            document.documentElement.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature").item(0)
 
         if (headerNode != null && signatureElement != null) {
             headerNode.appendChild(signatureElement)

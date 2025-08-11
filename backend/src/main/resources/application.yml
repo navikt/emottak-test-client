@@ -4,3 +4,6 @@ alias: "ARBEIDS- OG VELFERDSETATEN"
 signing:
   key: ${VIRKSOMHETSSERTIFIKAT_SIGNERING}
   password: ${VIRKSOMHETSSERTIFIKAT_CREDENTIALS}
+server:
+  port: 13001
+  preWait: "5s"

@@ -4,6 +4,7 @@ import com.sksamuel.hoplite.ConfigLoader
 import com.sksamuel.hoplite.ExperimentalHoplite
 import com.sksamuel.hoplite.addEnvironmentSource
 import com.sksamuel.hoplite.addResourceSource
+import no.nav.emottak.utils.config.Server
 
 @OptIn(ExperimentalHoplite::class)
 fun applicationConfig() = ConfigLoader.builder()
@@ -17,7 +18,8 @@ data class ApplicationConfig(
     val hostName: String,
     val ebmsSyncRouterUrl: String,
     val signing: SigningConfig,
-    val alias: String
+    val alias: String,
+    val server: Server
 )
 
 data class SigningConfig(
