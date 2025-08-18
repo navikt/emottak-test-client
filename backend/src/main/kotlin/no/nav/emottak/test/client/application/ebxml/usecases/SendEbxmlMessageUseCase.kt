@@ -91,7 +91,9 @@ class SendEbxmlMessageUseCase(
                             append("Content-Type", contentType)
                             append("SOAPAction", "ebXML")
                             append("MIME-Version", "1.0")
-                            append("X_SEND_TO", "ny") // TODO: Lag toggle for dette i FE. Forces eMottak forwarding to new eMottak flow
+                            if (requestDto.useNewEmottakFlow) {
+                                append("X_SEND_TO", "ny")
+                            }
                             append("Message-Id", requestDto.messageId)
                             append("Accept", "*/*")
                         }
@@ -155,7 +157,8 @@ data class EbxmlRequest(
     val messageId: String = UUID.randomUUID().toString(),
     val timestamp: String = Instant.now().toString(),
     val ebxmlPayload: EbxmlPayload? = null,
-    val signPayload: Boolean? = false
+    val signPayload: Boolean? = false,
+    val useNewEmottakFlow: Boolean = true,
 )
 
 @Serializable
