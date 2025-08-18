@@ -13,6 +13,7 @@ export const frikortEgenandelForesporselRequest: EbxmlRequest = {
   service: "HarBorgerFrikort",
   action: "EgenandelForesporsel",
   signPayload: true,
+  useNewEmottakFlow: true,
   ebxmlPayload: {
     base64Content: encodeXmlToBase64(
       `
