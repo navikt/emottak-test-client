@@ -57,7 +57,7 @@ data class EbxmlRequestDto(
     val action: String,
     val ebxmlPayload: PayloadDto? = null,
     val signPayload: Boolean = false,
-    val useNewEmottakFlow: Boolean = true,
+    val useNewEmottakFlow: Boolean = true
 ) {
     @Serializable
     data class PayloadDto(

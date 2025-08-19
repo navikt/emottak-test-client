@@ -158,7 +158,7 @@ data class EbxmlRequest(
     val timestamp: String = Instant.now().toString(),
     val ebxmlPayload: EbxmlPayload? = null,
     val signPayload: Boolean? = false,
-    val useNewEmottakFlow: Boolean = true,
+    val useNewEmottakFlow: Boolean = true
 )
 
 @Serializable
