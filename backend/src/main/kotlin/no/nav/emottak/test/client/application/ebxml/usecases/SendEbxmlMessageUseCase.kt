@@ -93,6 +93,8 @@ class SendEbxmlMessageUseCase(
                             append("MIME-Version", "1.0")
                             if (requestDto.useNewEmottakFlow) {
                                 append("X_SEND_TO", "ny")
+                            } else {
+                                append("X_SEND_TO", "gammel")
                             }
                             append("Message-Id", requestDto.messageId)
                             append("Accept", "*/*")
