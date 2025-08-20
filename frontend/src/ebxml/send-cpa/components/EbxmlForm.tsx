@@ -125,13 +125,13 @@ export default function EbxmlForm() {
               }
             />
             <Label htmlFor="useNewEmottakFlow" className="select-none cursor-pointer">
-              Force new Emottak flow
+              Force new eMottak flow
             </Label>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  aria-label="What is the new Emottak flow?"
+                  aria-label="What is the new eMottak flow?"
                   className="flex h-5 w-5 items-center justify-center rounded hover:bg-muted"
                 >
                   <Info className="h-4 w-4 text-muted-foreground" />
@@ -139,14 +139,14 @@ export default function EbxmlForm() {
               </TooltipTrigger>
               <TooltipContent className="max-w-sm text-sm leading-relaxed">
                 <div className="space-y-1">
-                  <p className="font-medium">Routing override</p>
+                  <p className="font-medium">Request routing override</p>
                   <p>
-                    <b>Enabled</b>: Force the request through the <em>new Emottak flow</em>,
+                    <b>Enabled</b>: Force the request through the <em>new eMottak flow</em>,
                     bypassing the normal router logic.
                   </p>
                   <p>
-                    <b>Disabled</b>: Use the normal flow. We don’t send an override, and the
-                    proxy/router decides the route.
+                    <b>Disabled</b>: Forces the request to use the <em>old eMottak flow</em>,
+                    bypassing the normal router logic.
                   </p>
                 </div>
               </TooltipContent>
