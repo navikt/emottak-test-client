@@ -37,7 +37,9 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
 
     private val log = LoggerFactory.getLogger(EbxmlDocumentBuilder::class.java)
     private val documentSigner = DocumentSigner(
-        applicationConfig.signing.key, applicationConfig.signing.password.toCharArray(), applicationConfig.alias
+        applicationConfig.signing.key,
+        applicationConfig.signing.password.toCharArray(),
+        applicationConfig.alias
     )
 
     fun ByteArray.asDocument(): Document {
@@ -68,7 +70,9 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
         }
 
         return@let Payload(
-            bytes = payloadAsBytes, contentType = "application/xml", contentId = contentId
+            bytes = payloadAsBytes,
+            contentType = "application/xml",
+            contentId = contentId
         )
     }
 
@@ -124,7 +128,8 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
                                 PartyId().apply {
                                     type = "HER"
                                     value = requestDto.fromPartyId
-                                })
+                                }
+                            )
                             role = requestDto.fromRole
                         }
                         to = To().apply {
@@ -132,7 +137,8 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
                                 PartyId().apply {
                                     type = "HER"
                                     value = requestDto.toPartyId
-                                })
+                                }
+                            )
                             role = requestDto.toRole
                         }
                         cpaId = requestDto.cpaId
@@ -146,14 +152,16 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
                             messageId = requestDto.messageId
                             timestamp = parsedDate
                         }
-                    })
+                    }
+                )
 
                 any.add(
                     SyncReply().apply {
                         this.isMustUnderstand = true
                         this.actor = "http://schemas.xmlsoap.org/soap/actor/next"
                         version = "2.0"
-                    })
+                    }
+                )
             }
             body = Body().apply {
                 xmlMarshaller
@@ -165,8 +173,10 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
                                 Reference().apply {
                                     type = "simple"
                                     href = "cid:$payloadContentId"
-                                })
-                        })
+                                }
+                            )
+                        }
+                    )
                 }
             }
         }
