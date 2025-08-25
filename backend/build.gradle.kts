@@ -5,8 +5,8 @@ val koin_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.10"
-    kotlin("plugin.serialization") version "1.9.0"
-    id("io.ktor.plugin") version "2.3.12"
+    kotlin("plugin.serialization") version "2.0.10"
+    id("io.ktor.plugin") version "3.1.2"
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
 }
 
@@ -41,46 +41,44 @@ repositories {
 }
 
 dependencies {
+    implementation(platform("io.ktor:ktor-bom:$ktor_version"))
+
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("io.ktor:ktor-server-content-negotiation-jvm")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
+    implementation("io.ktor:ktor-serialization-kotlinx-xml-jvm")
 
-    implementation("io.ktor:ktor-client-core:$ktor_version")
-    implementation("io.ktor:ktor-client-cio:$ktor_version")
-
-    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("io.ktor:ktor-client-core")
+    implementation("io.ktor:ktor-client-cio")
+    implementation("io.ktor:ktor-client-content-negotiation")
+    implementation("io.ktor:ktor-client-logging-jvm")
 
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+
+    implementation("org.codehaus.janino:janino:3.1.6")
+    implementation("no.nav.emottak:emottak-utils:0.3.2")
     implementation("no.nav.emottak:emottak-payload-xsd:0.0.2")
     implementation("no.nav.emottak:ebxml-protokoll:0.0.6")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
-    implementation("io.ktor:ktor-serialization-kotlinx-xml:$ktor_version")
-    implementation("io.ktor:ktor-client-logging:$ktor_version")
-
-    implementation(project.dependencies.platform("io.insert-koin:koin-bom:$koin_version"))
+    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
     implementation("io.insert-koin:koin-core")
 
     implementation("com.sksamuel.hoplite:hoplite-core:2.8.2")
     implementation("com.sksamuel.hoplite:hoplite-yaml:2.8.2")
-    implementation("org.codehaus.janino:janino:3.1.6")
 
     implementation("io.arrow-kt:arrow-core:2.1.0")
     implementation("io.arrow-kt:arrow-fx-coroutines:2.1.0")
     implementation("io.arrow-kt:suspendapp:2.1.0")
     implementation("io.arrow-kt:suspendapp-ktor:2.1.0")
 
-    implementation("no.nav.emottak:emottak-utils:0.3.2")
-
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
-
     testImplementation("io.mockk:mockk:1.13.5")
-    testImplementation("io.kotest:kotest-runner-junit5:5.6.2")
 }
 
 tasks.withType<Test>().configureEach {

@@ -56,7 +56,8 @@ data class EbxmlRequestDto(
     val service: String,
     val action: String,
     val ebxmlPayload: PayloadDto? = null,
-    val signPayload: Boolean = false
+    val signPayload: Boolean = false,
+    val useNewEmottakFlow: Boolean = true
 ) {
     @Serializable
     data class PayloadDto(
@@ -76,6 +77,7 @@ data class EbxmlRequestDto(
             service = service,
             action = action,
             signPayload = signPayload,
+            useNewEmottakFlow = useNewEmottakFlow,
             ebxmlPayload = ebxmlPayload?.let {
                 EbxmlPayload(
                     base64Content = it.base64Content ?: "",

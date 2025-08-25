@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert } from "@/components/ui/alert";
 import React, { useRef, useState } from "react";
-import { Loader2, RefreshCw } from "lucide-react";
+import { Info, Loader2, RefreshCw } from "lucide-react";
 import { EbxmlResult, sendEbxmlRequest } from "@/ebxml/send-cpa/actions/send-request";
 import CodeMirrorWithDelay from "@/ebxml/send-cpa/components/CodeMirror/CodeMirrorWithDelay";
 import CpaTemplateSelector from "@/ebxml/send-cpa/components/CpaTemplateSelector/CpaTemplateSelector";
@@ -16,6 +16,7 @@ import { githubLight } from "@uiw/codemirror-theme-github";
 import { generateKibanaURLFromConversationId } from "@/lib/generate-kibana-url";
 import { v4 as uuidv4 } from "uuid";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Accordion,
   AccordionContent,
@@ -48,6 +49,7 @@ export default function EbxmlForm() {
       service: "",
       action: "",
       signPayload: false,
+      useNewEmottakFlow: true,
       ebxmlPayload: { base64Content: "" },
     });
     setError(null);
@@ -107,11 +109,51 @@ export default function EbxmlForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex justify-between">
-        <div>
-          <Label>CPA Template:</Label>
-          <CpaTemplateSelector selectedTemplate={formData} onTemplateChange={setFormData} />
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <div>
+            <Label>CPA Template:</Label>
+            <CpaTemplateSelector selectedTemplate={formData} onTemplateChange={setFormData} />
+          </div>
+
+          <div className="flex items-center mt-6 gap-2">
+            <Checkbox
+              id="useNewEmottakFlow"
+              checked={formData.useNewEmottakFlow}
+              onCheckedChange={(checked) =>
+                setFormData((prev) => ({ ...prev, useNewEmottakFlow: !!checked }))
+              }
+            />
+            <Label htmlFor="useNewEmottakFlow" className="select-none cursor-pointer">
+              Force new eMottak flow
+            </Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="What is the new eMottak flow?"
+                  className="flex h-5 w-5 items-center justify-center rounded hover:bg-muted"
+                >
+                  <Info className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-sm text-sm leading-relaxed">
+                <div className="space-y-1">
+                  <p className="font-medium">Request routing override</p>
+                  <p>
+                    <b>Enabled</b>: Force the request through the <em>new eMottak flow</em>,
+                    bypassing the normal router logic.
+                  </p>
+                  <p>
+                    <b>Disabled</b>: Forces the request to use the <em>old eMottak flow</em>,
+                    bypassing the normal router logic.
+                  </p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
+
         <Button type="button" variant="outline" className="bg-red-100" onClick={handleClear}>
           Clear Form
         </Button>
