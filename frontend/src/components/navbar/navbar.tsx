@@ -23,6 +23,12 @@ export function SiteNavbar() {
         >
           XML Tool
         </Link>
+        <Link
+          href="/base64-tool"
+          className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "rounded-lg")}
+        >
+          Base64 Tool
+        </Link>
       </nav>
     </div>
   );
