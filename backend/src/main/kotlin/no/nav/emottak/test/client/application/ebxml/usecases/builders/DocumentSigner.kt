@@ -25,7 +25,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec
 import javax.xml.crypto.dsig.spec.TransformParameterSpec
 
-class DocumentSigner(keystoreBase64: String? = null, keystorePath: String? = null, keystorePassword: CharArray, alias: String) {
+class DocumentSigner(keystoreBase64: String? = null, keystorePath: String? = null, keystorePassword: CharArray) {
 
     private val log = LoggerFactory.getLogger(DocumentSigner::class.java)
     private val signingKey: PrivateKey
@@ -50,10 +50,12 @@ class DocumentSigner(keystoreBase64: String? = null, keystorePath: String? = nul
                 load(keystoreData, keystorePassword)
             }
         }
+        val alias = keyStore.aliases().toList().first()
         signingKey = keyStore.getKey(alias, keystorePassword) as PrivateKey
         signingCertificate = keyStore.getCertificate(alias) as X509Certificate
 
         log.info("Signing Certificate:")
+        log.info("  Alias: $alias")
         log.info("  Subject DN: ${signingCertificate.subjectDN}")
         log.info("  Issuer DN: ${signingCertificate.issuerDN}")
         log.info("  Serial Number: ${signingCertificate.serialNumber}")
