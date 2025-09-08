@@ -1,12 +1,12 @@
 package no.nav.emottak.test.client.application.ebxml.usecases.builders
 
-import java.io.File
-import java.io.FileInputStream
 import no.nav.emottak.test.client.domain.Payload
 import no.nav.emottak.test.client.infrastructure.xml.EbmsAttachmentURIDereferencer
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
+import java.io.File
+import java.io.FileInputStream
 import java.security.KeyStore
 import java.security.PrivateKey
 import java.security.Security
@@ -37,10 +37,11 @@ class DocumentSigner(keystoreBase64: String, keystorePath: String?, keystorePass
 
     init {
         Security.addProvider(BouncyCastleProvider())
-        val keyStore = if (keystorePath?.isNotBlank()?:false && File(keystorePath).exists()) {
+        val keyStore = if (keystorePath?.isNotBlank() ?: false && File(keystorePath).exists()) {
             KeyStore.getInstance("PKCS12").apply {
                 load(
-                    FileInputStream(keystorePath), keystorePassword
+                    FileInputStream(keystorePath),
+                    keystorePassword
                 )
             }
         } else {
