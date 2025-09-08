@@ -24,5 +24,6 @@ data class ApplicationConfig(
 
 data class SigningConfig(
     val key: String,
-    val password: String
+    val password: String,
+    val path: String
 )

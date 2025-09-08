@@ -25,7 +25,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec
 import javax.xml.crypto.dsig.spec.TransformParameterSpec
 
-class DocumentSigner(keystoreBase64: String, keystorePath: String?, keystorePassword: CharArray, alias: String) {
+class DocumentSigner(keystoreBase64: String? = null, keystorePath: String? = null, keystorePassword: CharArray, alias: String) {
 
     private val log = LoggerFactory.getLogger(DocumentSigner::class.java)
     private val signingKey: PrivateKey
@@ -45,7 +45,7 @@ class DocumentSigner(keystoreBase64: String, keystorePath: String?, keystorePass
                 )
             }
         } else {
-            val keystoreData = decodeBase64KeyStore(keystoreBase64)
+            val keystoreData = decodeBase64KeyStore(keystoreBase64!!)
             KeyStore.getInstance("PKCS12").apply {
                 load(keystoreData, keystorePassword)
             }
