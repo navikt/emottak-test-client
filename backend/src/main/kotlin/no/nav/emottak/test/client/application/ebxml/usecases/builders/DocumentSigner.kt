@@ -1,5 +1,7 @@
 package no.nav.emottak.test.client.application.ebxml.usecases.builders
 
+import java.io.File
+import java.io.FileInputStream
 import no.nav.emottak.test.client.domain.Payload
 import no.nav.emottak.test.client.infrastructure.xml.EbmsAttachmentURIDereferencer
 import org.bouncycastle.jce.provider.BouncyCastleProvider
@@ -23,7 +25,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec
 import javax.xml.crypto.dsig.spec.TransformParameterSpec
 
-class DocumentSigner(keystoreBase64: String, keystorePassword: CharArray, alias: String) {
+class DocumentSigner(keystoreBase64: String, keystorePath: String?, keystorePassword: CharArray, alias: String) {
 
     private val log = LoggerFactory.getLogger(DocumentSigner::class.java)
     private val signingKey: PrivateKey
@@ -35,9 +37,17 @@ class DocumentSigner(keystoreBase64: String, keystorePassword: CharArray, alias:
 
     init {
         Security.addProvider(BouncyCastleProvider())
-        val keystoreData = decodeBase64KeyStore(keystoreBase64)
-        val keyStore = KeyStore.getInstance("PKCS12").apply {
-            load(keystoreData, keystorePassword)
+        val keyStore = if (keystorePath?.isNotBlank()?:false && File(keystorePath).exists()) {
+            KeyStore.getInstance("PKCS12").apply {
+                load(
+                    FileInputStream(keystorePath), keystorePassword
+                )
+            }
+        } else {
+            val keystoreData = decodeBase64KeyStore(keystoreBase64)
+            KeyStore.getInstance("PKCS12").apply {
+                load(keystoreData, keystorePassword)
+            }
         }
         signingKey = keyStore.getKey(alias, keystorePassword) as PrivateKey
         signingCertificate = keyStore.getCertificate(alias) as X509Certificate
