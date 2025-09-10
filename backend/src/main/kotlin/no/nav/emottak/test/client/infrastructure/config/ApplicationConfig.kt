@@ -18,11 +18,11 @@ data class ApplicationConfig(
     val hostName: String,
     val ebmsSyncRouterUrl: String,
     val signing: SigningConfig,
-    val alias: String,
     val server: Server
 )
 
 data class SigningConfig(
     val key: String,
-    val password: String
+    val password: String,
+    val path: String
 )

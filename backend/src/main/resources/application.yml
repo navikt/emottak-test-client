@@ -3,7 +3,8 @@ ebmsSyncRouterUrl: "https://ebms-sync-router.dev.intern.nav.no/ebxml/msh"
 alias: "ARBEIDS- OG VELFERDSETATEN"
 signing:
   key: ${VIRKSOMHETSSERTIFIKAT_SIGNERING}
-  password: ${VIRKSOMHETSSERTIFIKAT_CREDENTIALS}
+  password: ${KEYSTORE_PWD_2025}
+  path: ${KEYSTORE_FILE_SIGN_2025_PATH}
 server:
   port: 13001
   preWait: "5s"

@@ -29,6 +29,12 @@ spec:
         - application: emottak-test-client
   envFrom:
     - secret: emottak-test-client
+    - secret: ebms-keystore-pwd-2025
+  filesFrom:
+    - secret: ebms-keystore-2025
+      mountPath: /var/run/secrets/ebms-keystore-2025
   env:
     - name: EMOTTAK_LOGGING_LEVEL
       value: DEBUG
+    - name: KEYSTORE_FILE_SIGN_2025_PATH
+      value: /var/run/secrets/ebms-keystore-2025/nav_signing_test.p12

@@ -37,9 +37,8 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
 
     private val log = LoggerFactory.getLogger(EbxmlDocumentBuilder::class.java)
     private val documentSigner = DocumentSigner(
-        applicationConfig.signing.key,
-        applicationConfig.signing.password.toCharArray(),
-        applicationConfig.alias
+        keystorePath = applicationConfig.signing.path,
+        keystorePassword = applicationConfig.signing.password.toCharArray()
     )
 
     fun ByteArray.asDocument(): Document {
