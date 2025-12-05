@@ -54,13 +54,13 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation")
     implementation("io.ktor:ktor-client-logging-jvm")
 
-    implementation("net.logstash.logback:logstash-logback-encoder:7.4")
+    implementation("net.logstash.logback:logstash-logback-encoder:9.2.2")
     implementation("ch.qos.logback:logback-classic:$logback_version")
 
     implementation("org.codehaus.janino:janino:3.1.6")
     implementation("no.nav.emottak:emottak-utils:0.3.2")
-    implementation("no.nav.emottak:emottak-payload-xsd:0.0.2")
-    implementation("no.nav.emottak:ebxml-protokoll:0.0.6")
+    implementation("no.nav.emottak:emottak-payload-xsd:0.0.11")
+    implementation("no.nav.emottak:ebxml-protokoll:0.0.7")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     implementation(platform("io.insert-koin:koin-bom:$koin_version"))
