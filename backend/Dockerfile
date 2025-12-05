@@ -1,19 +1,11 @@
-FROM gradle:8.10-jdk21 AS backend-builder
-
-WORKDIR /backend
-COPY . .
-
-FROM openjdk:21-jdk-slim AS final-backend
-
-RUN useradd --uid 10000 --create-home runner
-USER 10000
+FROM eclipse-temurin:21-jdk-alpine
 
 ENV NODE_ENV=production
 ENV PRODUCTION=true
 
+COPY build/libs/app.jar /app/app.jar
+
 WORKDIR /app
-COPY --from=backend-builder /backend/build/libs/app.jar /app/backend.jar
+USER nonroot
 
-EXPOSE 8080
-
-CMD ["java", "-jar", "/app/backend.jar", "--server.port=8080"]
+CMD [ "app.jar" ]
