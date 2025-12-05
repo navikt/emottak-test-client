@@ -1,19 +1,11 @@
-FROM gradle:8.10-jdk21 AS backend-builder
-
-WORKDIR /backend
-COPY . .
-
-FROM openjdk:21-jdk-slim AS final-backend
-
-RUN useradd --uid 10000 --create-home runner
-USER 10000
+FROM gcr.io/distroless/java21-debian12@sha256:f995f26f78b65251a0511109b07401a5c6e4d7b5284ae73e8d6577d24ff26763
 
 ENV NODE_ENV=production
 ENV PRODUCTION=true
 
+COPY build/libs/app.jar /app/app.jar
+
 WORKDIR /app
-COPY --from=backend-builder /backend/build/libs/app.jar /app/backend.jar
+USER nonroot
 
-EXPOSE 8080
-
-CMD ["java", "-jar", "/app/backend.jar", "--server.port=8080"]
+CMD [ "app.jar" ]

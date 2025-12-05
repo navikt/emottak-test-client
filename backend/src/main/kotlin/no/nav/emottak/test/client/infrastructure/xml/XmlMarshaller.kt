@@ -1,11 +1,11 @@
 package no.nav.emottak.test.client.infrastructure.xml
 
+import jakarta.xml.bind.JAXBContext
 import org.w3c.dom.Document
 import org.xmlsoap.schemas.soap.envelope.Envelope
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.StringWriter
-import javax.xml.bind.JAXBContext
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
