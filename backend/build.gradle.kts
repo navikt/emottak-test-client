@@ -4,8 +4,8 @@ val ktor_version: String by project
 val koin_version: String by project
 
 plugins {
-    kotlin("jvm") version "2.0.10"
-    kotlin("plugin.serialization") version "2.0.10"
+    kotlin("jvm") version "2.2.21"
+    kotlin("plugin.serialization") version "2.2.21"
     id("io.ktor.plugin") version "3.1.2"
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
 }
@@ -22,6 +22,22 @@ application {
 
 repositories {
     mavenCentral()
+    exclusiveContent {
+        // emottak-payload-xsd depends on org.apache.cxf:cxf-rt-ws-security:4.1.4 which depends on opensaml-saml-impl:5.1.6
+        // This is not available in maven central
+        forRepository {
+            maven {
+                name = "Shibboleth"
+                url = uri("https://build.shibboleth.net/maven/releases/")
+            }
+        }
+        filter {
+            // Only allow specific group/artifact from Shibboleth
+            includeGroup("org.opensaml")
+            includeGroup("net.shibboleth")
+            // Add more includeGroup or includeModule as needed
+        }
+    }
     maven {
         name = "Ebxml protokoll"
         url = uri("https://maven.pkg.github.com/navikt/ebxml-protokoll")
@@ -54,14 +70,16 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation")
     implementation("io.ktor:ktor-client-logging-jvm")
 
-    implementation("net.logstash.logback:logstash-logback-encoder:7.4")
+    implementation("net.logstash.logback:logstash-logback-encoder:8.1")
     implementation("ch.qos.logback:logback-classic:$logback_version")
 
     implementation("org.codehaus.janino:janino:3.1.6")
     implementation("no.nav.emottak:emottak-utils:0.3.2")
-    implementation("no.nav.emottak:emottak-payload-xsd:0.0.2")
-    implementation("no.nav.emottak:ebxml-protokoll:0.0.6")
+    implementation("no.nav.emottak:emottak-payload-xsd:0.0.11")
+    implementation("no.nav.emottak:ebxml-protokoll:0.0.7")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
+    implementation("org.apache.santuario:xmlsec:3.0.3")
 
     implementation(platform("io.insert-koin:koin-bom:$koin_version"))
     implementation("io.insert-koin:koin-core")
