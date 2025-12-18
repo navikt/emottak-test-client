@@ -7,7 +7,7 @@ metadata:
     team: team-emottak
 spec:
   ingresses:
-    - https://emottak-test-client-backend.dev.intern.nav.no
+    - https://emottak-test-client-backend.intern.dev.nav.no
   image: {{image}}
   port: 13001
   replicas:
@@ -15,10 +15,9 @@ spec:
     min: 1
   resources:
     limits:
-      cpu: "1000m"
-      memory: "512Mi"
+      memory: "256Mi"
     requests:
-      cpu: "100m"
+      cpu: "50m"
       memory: "256Mi"
   accessPolicy:
     inbound:
