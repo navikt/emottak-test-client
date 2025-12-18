@@ -8,7 +8,7 @@ metadata:
 spec:
   ingresses:
     - https://emottak-test-client.intern.dev.nav.no
-    - https://emottak-test-client.ansatt.dev.nav.no
+#    - https://emottak-test-client.ansatt.dev.nav.no Add this if frontend is moved to GCP
   image: {{image}}
   port: 3000
   replicas:
