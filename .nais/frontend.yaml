@@ -7,7 +7,8 @@ metadata:
     team: team-emottak
 spec:
   ingresses:
-    - https://emottak-test-client.dev.intern.nav.no
+    - https://emottak-test-client.intern.dev.nav.no
+    - https://emottak-test-client.ansatt.dev.nav.no
   image: {{image}}
   port: 3000
   replicas:
@@ -15,11 +16,10 @@ spec:
     min: 1
   resources:
     limits:
-      cpu: "1000m"
-      memory: "512Mi"
-    requests:
-      cpu: "100m"
       memory: "256Mi"
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
   accessPolicy:
     inbound:
       rules:
@@ -29,4 +29,4 @@ spec:
         - application: emottak-test-client-backend
   env:
     - name: TEST_CLIENT_BACKEND_BASE_URL
-      value: "https://emottak-test-client-backend.dev.intern.nav.no"
+      value: "https://emottak-test-client-backend.intern.dev.nav.no"
