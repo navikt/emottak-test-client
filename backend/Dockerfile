@@ -6,6 +6,5 @@ ENV PRODUCTION=true
 COPY build/libs/app.jar /app/app.jar
 
 WORKDIR /app
-USER nonroot
 
-CMD [ "app.jar" ]
+CMD ["-jar", "app.jar"]
