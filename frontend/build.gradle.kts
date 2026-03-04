@@ -9,7 +9,7 @@ plugins {
 }
 
 node {
-    version.set("18.19.1")
+    version.set("22.11.0")
     yarnVersion.set("1.22.22")
     download.set(true)
     workDir.set(file("${project.projectDir}/.gradle/nodejs"))
