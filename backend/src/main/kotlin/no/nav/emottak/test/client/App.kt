@@ -19,9 +19,11 @@ import io.ktor.server.routing.routing
 import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.awaitCancellation
 import no.nav.emottak.test.client.adapters.ebxml.controller.sendEbxmlMessageRoute
+import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageAsyncUseCase
 import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageUseCase
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.config.applicationConfig
+import no.nav.emottak.test.client.infrastructure.kafka.KafkaProducerService
 import no.nav.emottak.test.client.infrastructure.plugins.configureSerialization
 import org.slf4j.LoggerFactory
 
@@ -56,8 +58,10 @@ fun Application.testClientModule() {
 
     val applicationConfig: ApplicationConfig = applicationConfig()
     val sendEbxmlMessageUseCase = createSendEbxmlMessageUseCase(applicationConfig)
-    registerSendEbxmlMessageRoute(sendEbxmlMessageUseCase)
+    val kafkaProducerService = KafkaProducerService(applicationConfig.kafka.bootstrapServers)
+    val sendEbxmlMessageAsyncUseCase = SendEbxmlMessageAsyncUseCase(applicationConfig, kafkaProducerService)
 
+    registerSendEbxmlMessageRoute(sendEbxmlMessageUseCase, sendEbxmlMessageAsyncUseCase)
     configureHelloWorldRouting()
 }
 
@@ -71,9 +75,12 @@ private fun createSendEbxmlMessageUseCase(applicationConfig: ApplicationConfig):
     return SendEbxmlMessageUseCase(applicationConfig, httpClient)
 }
 
-private fun Application.registerSendEbxmlMessageRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCase) {
+private fun Application.registerSendEbxmlMessageRoute(
+    sendEbxmlMessageUseCase: SendEbxmlMessageUseCase,
+    sendEbxmlMessageAsyncUseCase: SendEbxmlMessageAsyncUseCase
+) {
     routing {
-        sendEbxmlMessageRoute(sendEbxmlMessageUseCase)
+        sendEbxmlMessageRoute(sendEbxmlMessageUseCase, sendEbxmlMessageAsyncUseCase)
     }
 }
 

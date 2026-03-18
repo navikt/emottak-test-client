@@ -50,6 +50,7 @@ export default function EbxmlForm() {
       action: "",
       signPayload: false,
       useNewEmottakFlow: true,
+      sendAsync: false,
       ebxmlPayload: { base64Content: "" },
     });
     setError(null);
@@ -147,6 +148,43 @@ export default function EbxmlForm() {
                   <p>
                     <b>Disabled</b>: Forces the request to use the <em>old eMottak flow</em>,
                     bypassing the normal router logic.
+                  </p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+
+          <div className="flex items-center mt-6 gap-2">
+            <Checkbox
+              id="sendAsync"
+              checked={formData.sendAsync}
+              onCheckedChange={(checked) =>
+                setFormData((prev) => ({ ...prev, sendAsync: !!checked }))
+              }
+            />
+            <Label htmlFor="sendAsync" className="select-none cursor-pointer">
+              Send async (Kafka)
+            </Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="What is async sending?"
+                  className="flex h-5 w-5 items-center justify-center rounded hover:bg-muted"
+                >
+                  <Info className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-sm text-sm leading-relaxed">
+                <div className="space-y-1">
+                  <p className="font-medium">Async sending via Kafka</p>
+                  <p>
+                    <b>Enabled</b>: Publishes the eBXML envelope directly to the Kafka topic{" "}
+                    <em>team-emottak.smtp.in.ebxml.payload</em>, bypassing smtp-transport.
+                    Processed by the <em>ebms-async</em> module in ebxml-processor.
+                  </p>
+                  <p>
+                    <b>Disabled</b>: Sends the message synchronously via HTTP to ebms-sync-router (default).
                   </p>
                 </div>
               </TooltipContent>
