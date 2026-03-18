@@ -14,6 +14,7 @@ export const frikortEgenandelForesporselRequest: EbxmlRequest = {
   action: "EgenandelForesporsel",
   signPayload: true,
   useNewEmottakFlow: true,
+  sendAsync: false,
   ebxmlPayload: {
     base64Content: encodeXmlToBase64(
       `

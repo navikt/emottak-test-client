@@ -14,6 +14,7 @@ export const pasientlisteForesporselHentPasientlisteWithHelseIdRequest: EbxmlReq
   action: "HentPasientliste",
   signPayload: true,
   useNewEmottakFlow: true,
+  sendAsync: false,
   ebxmlPayload: {
     base64Content: encodeXmlToBase64(
       `
