@@ -1,7 +1,6 @@
 package no.nav.emottak.test.client.infrastructure.smtp
 
 import io.ktor.client.HttpClient
-import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -14,17 +13,14 @@ import org.slf4j.LoggerFactory
 
 class SmtpTransportClient(
     private val baseUrl: String,
-    private val httpClient: HttpClient,
-    private val tokenProvider: suspend () -> String
+    private val httpClient: HttpClient
 ) {
 
     private val log = LoggerFactory.getLogger(SmtpTransportClient::class.java)
 
     suspend fun storePayload(payloads: List<PayloadDto>) {
-        val token = tokenProvider()
         val response = httpClient.post("$baseUrl/api/payloads") {
             contentType(ContentType.Application.Json)
-            bearerAuth(token)
             setBody(Json.encodeToString(payloads))
         }
         if (response.status != HttpStatusCode.Created) {
