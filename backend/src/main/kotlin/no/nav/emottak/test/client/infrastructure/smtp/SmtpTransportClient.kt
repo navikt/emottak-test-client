@@ -19,6 +19,7 @@ class SmtpTransportClient(
     private val log = LoggerFactory.getLogger(SmtpTransportClient::class.java)
 
     suspend fun storePayload(payloads: List<PayloadDto>) {
+        log.info("Will store ${payloads.size} payload(s) in smtp-transport")
         val response = httpClient.post("$baseUrl/api/payloads") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(payloads))

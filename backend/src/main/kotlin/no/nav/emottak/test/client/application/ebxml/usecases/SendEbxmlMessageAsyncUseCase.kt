@@ -21,6 +21,7 @@ class SendEbxmlMessageAsyncUseCase(
 
     suspend fun sendEbxmlMessage(requestDto: EbxmlRequest): EbxmlResult {
         return try {
+            log.info("Validating ASYNC request")
             validateRequestDto(requestDto)
 
             val builder = EbxmlDocumentBuilder(applicationConfig, requestDto)
@@ -31,6 +32,7 @@ class SendEbxmlMessageAsyncUseCase(
             // Lagre payload i smtp-transport (referenceId = messageId)
             val payload = builder.payload
             if (payload != null) {
+                log.info("Storing ASYNC payload in SMTP DB")
                 val contentId = payload.contentId.removePrefix("cid:")
                 withContext(Dispatchers.IO) {
                     smtpTransportClient.storePayload(
@@ -48,6 +50,7 @@ class SendEbxmlMessageAsyncUseCase(
             }
 
             // Publiser konvolutten til Kafka
+            log.info("Publishing envelope for ASYNC payload to EBXML IN topic")
             withContext(Dispatchers.IO) {
                 kafkaProducerService.publish(
                     topic = applicationConfig.kafka.topic,
