@@ -80,6 +80,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
     implementation("org.apache.santuario:xmlsec:3.0.3")
+    implementation("org.apache.kafka:kafka-clients:3.9.0")
 
     implementation(platform("io.insert-koin:koin-bom:$koin_version"))
     implementation("io.insert-koin:koin-core")

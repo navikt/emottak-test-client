@@ -50,6 +50,7 @@ export default function EbxmlForm() {
       action: "",
       signPayload: false,
       useNewEmottakFlow: true,
+      sendAsync: false,
       ebxmlPayload: { base64Content: "" },
     });
     setError(null);
@@ -152,6 +153,42 @@ export default function EbxmlForm() {
               </TooltipContent>
             </Tooltip>
           </div>
+            <div className="flex items-center mt-6 gap-2">
+                <Checkbox
+                    id="sendAsync"
+                    checked={formData.sendAsync}
+                    onCheckedChange={(checked) =>
+                        setFormData((prev) => ({ ...prev, sendAsync: !!checked }))
+                    }
+                />
+                <Label htmlFor="sendAsync" className="select-none cursor-pointer">
+                    Send async (Kafka)
+                </Label>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            type="button"
+                            aria-label="What is async sending?"
+                            className="flex h-5 w-5 items-center justify-center rounded hover:bg-muted"
+                        >
+                            <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm text-sm leading-relaxed">
+                        <div className="space-y-1">
+                            <p className="font-medium">Async sending via Kafka</p>
+                            <p>
+                                <b>Enabled</b>: Lagrer payload i smtp-transport og publiserer SOAP-konvolutten til
+                                Kafka-topicet <em>team-emottak.smtp.in.ebxml.payload</em>. Prosesseres av{" "}
+                                <em>ebms-async</em> i ebxml-processor.
+                            </p>
+                            <p>
+                                <b>Disabled</b>: Sender meldingen synkront via HTTP til ebms-sync-router (standard).
+                            </p>
+                        </div>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
         </div>
 
         <Button type="button" variant="outline" className="bg-red-100" onClick={handleClear}>

@@ -19,6 +19,8 @@ spec:
     requests:
       cpu: "50m"
       memory: "256Mi"
+  kafka:
+    pool: nav-dev
   accessPolicy:
     inbound:
       rules:
@@ -26,6 +28,7 @@ spec:
     outbound:
       rules:
         - application: emottak-test-client
+        - application: smtp-transport
   envFrom:
     - secret: emottak-test-client
     - secret: ebms-keystore-pwd-2025
