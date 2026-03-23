@@ -81,13 +81,13 @@ export const trekkopplysningInnmelding: EbxmlRequest = {
                         <KodeTrekkAlternativ DN="Løpende trekk månedssats" V="LOPM"/>
                         <Sats V="21573"/>
                     </Trekk>
-                    <Periode><PeriodeFomDato>2026-04-01</PeriodeFomDato></ns:Periode>
-                    <Kreditor><TSSId>80000415406</ns:TSSId></ns:Kreditor>
+                    <Periode><PeriodeFomDato>2026-04-01</PeriodeFomDato></Periode>
+                    <Kreditor><TSSId>80000415406</TSSId></Kreditor>
                 </InnrapporteringTrekk>
             </ns:Content>
         </ns:RefDoc>
     </ns:Document>
-</ns:ns:MsgHead>
+</ns:MsgHead>
     `.trim()
     ),
   },
