@@ -5,8 +5,8 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
@@ -24,7 +24,7 @@ class SmtpTransportClient(
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(payloads))
         }
-        if (response.status != HttpStatusCode.Created) {
+        if (!response.status.isSuccess()) {
             val body = response.bodyAsText()
             log.error("Failed to store payload in smtp-transport: ${response.status} $body")
             throw RuntimeException("Failed to store payload: ${response.status} $body")
