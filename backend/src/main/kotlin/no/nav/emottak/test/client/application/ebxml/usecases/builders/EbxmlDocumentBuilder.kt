@@ -58,9 +58,9 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
                 .newDocumentBuilder()
                 .parse(payloadAsBytes.inputStream())
                 .let { doc -> documentSigner.signerXML(doc).asByteArray() }
-        }
-        with(payloadAsBytes.asDocument().retrieveSignatureElement()) {
-            checkSignatureValue(keyInfo.x509Certificate)
+            with(payloadAsBytes.asDocument().retrieveSignatureElement()) {
+                checkSignatureValue(keyInfo.x509Certificate)
+            }
         }
         val contentId = if (it.ebxmlPayload.contentId.startsWith("cid:")) {
             it.ebxmlPayload.contentId
