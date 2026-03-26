@@ -40,6 +40,7 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
         keystorePath = applicationConfig.signing.path,
         keystorePassword = applicationConfig.signing.password.toCharArray()
     )
+    private val encrypting = Encrypting()
 
     fun ByteArray.asDocument(): Document {
         val factory = DocumentBuilderFactory.newInstance()
@@ -50,9 +51,9 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
 
     val payload: Payload? = requestDto.let {
         if (it.ebxmlPayload == null) return@let null
-        log.info("Signing Payload")
         var payloadAsBytes: ByteArray = Base64.getDecoder().decode(it.ebxmlPayload.base64Content.trim())
         if (it.signPayload == true) {
+            log.info("Signing Payload")
             payloadAsBytes = DocumentBuilderFactory.newInstance()
                 .apply { isNamespaceAware = true }
                 .newDocumentBuilder()
@@ -66,6 +67,10 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
             it.ebxmlPayload.contentId
         } else {
             "cid:${it.ebxmlPayload.contentId}"
+        }
+        if (it.encryptPayload == true) {
+            log.info("Encrypting Payload")
+            payloadAsBytes = encrypting.encrypt(payloadAsBytes)
         }
 
         return@let Payload(

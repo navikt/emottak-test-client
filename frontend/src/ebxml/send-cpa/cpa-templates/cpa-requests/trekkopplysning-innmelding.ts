@@ -13,6 +13,7 @@ export const trekkopplysningInnmelding: EbxmlRequest = {
   service: "Trekkopplysning",
   action: "Innmelding",
   signPayload: true,
+  encryptPayload: true,
   useNewEmottakFlow: true,
   sendAsync: true,
   ebxmlPayload: {

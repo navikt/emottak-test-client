@@ -13,6 +13,7 @@ export const pasientlisteForesporselHentPasientlisteWithHelseIdRequest: EbxmlReq
   service: "PasientlisteForesporsel",
   action: "HentPasientliste",
   signPayload: true,
+  encryptPayload: false,
   useNewEmottakFlow: true,
   sendAsync: false,
   ebxmlPayload: {

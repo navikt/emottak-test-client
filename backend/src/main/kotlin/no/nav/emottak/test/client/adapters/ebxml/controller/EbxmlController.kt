@@ -65,6 +65,7 @@ data class EbxmlRequestDto(
     val action: String,
     val ebxmlPayload: PayloadDto? = null,
     val signPayload: Boolean = false,
+    val encryptPayload: Boolean = false,
     val useNewEmottakFlow: Boolean = true,
     val sendAsync: Boolean = false
 ) {
@@ -86,6 +87,7 @@ data class EbxmlRequestDto(
             service = service,
             action = action,
             signPayload = signPayload,
+            encryptPayload = encryptPayload,
             useNewEmottakFlow = useNewEmottakFlow,
             ebxmlPayload = ebxmlPayload?.let {
                 EbxmlPayload(

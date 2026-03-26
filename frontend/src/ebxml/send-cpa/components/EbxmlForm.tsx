@@ -49,6 +49,7 @@ export default function EbxmlForm() {
       service: "",
       action: "",
       signPayload: false,
+      encryptPayload: false,
       useNewEmottakFlow: true,
       sendAsync: false,
       ebxmlPayload: { base64Content: "" },
@@ -282,17 +283,29 @@ export default function EbxmlForm() {
           {loading ? "Sending..." : "Send Request"}
         </Button>
 
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="signPayload"
-            checked={formData.signPayload}
-            onCheckedChange={(checked) =>
-              setFormData((prev) => ({ ...prev, signPayload: !!checked }))
-            }
-          />
-          <Label htmlFor="signPayload" className="select-none cursor-pointer">
-            Sign payload
-          </Label>
+          <div className="flex items-center gap-2">
+              <Checkbox
+                  id="signPayload"
+                  checked={formData.signPayload}
+                  onCheckedChange={(checked) =>
+                      setFormData((prev) => ({ ...prev, signPayload: !!checked }))
+                  }
+              />
+              <Label htmlFor="signPayload" className="select-none cursor-pointer">
+                  Sign payload
+              </Label>
+              <div className="flex items-center gap-2">
+                  <Checkbox
+                      id="encryptPayload"
+                      checked={formData.encryptPayload}
+                      onCheckedChange={(checked) =>
+                          setFormData((prev) => ({ ...prev, encryptPayload: !!checked }))
+                      }
+                  />
+                  <Label htmlFor="encryptPayload" className="select-none cursor-pointer">
+                      Encrypt payload
+                  </Label>
+              </div>
         </div>
       </div>
 

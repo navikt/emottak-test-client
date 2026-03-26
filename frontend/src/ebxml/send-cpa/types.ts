@@ -10,6 +10,7 @@ export interface EbxmlRequest {
   action: string;
   ebxmlPayload?: EbxmlPayload;
   signPayload: boolean;
+  encryptPayload: boolean;
   useNewEmottakFlow: boolean;
   sendAsync: boolean;
 }
