@@ -37,7 +37,6 @@ class SendEbxmlMessageAsyncUseCase(
                 log.info("Storing ASYNC payload in SMTP DB")
                 val contentId = payload.contentId.removePrefix("cid:")
                 withContext(Dispatchers.IO) {
-
                     // hvis det kommer med async meldingstyper som ikke skal krypteres, må vi ha et flagg som for signering
                     log.info("Encrypting ASYNC payload")
                     val encrypted = encrypting.encrypt(payload.bytes)
