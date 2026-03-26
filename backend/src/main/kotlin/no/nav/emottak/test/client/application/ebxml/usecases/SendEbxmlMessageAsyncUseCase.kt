@@ -3,6 +3,7 @@ package no.nav.emottak.test.client.application.ebxml.usecases
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import no.nav.emottak.test.client.application.ebxml.usecases.builders.EbxmlDocumentBuilder
+import no.nav.emottak.test.client.application.ebxml.usecases.builders.Encrypting
 import no.nav.emottak.test.client.domain.EbxmlResult
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.kafka.KafkaProducerService
@@ -14,7 +15,8 @@ import org.slf4j.LoggerFactory
 class SendEbxmlMessageAsyncUseCase(
     private val applicationConfig: ApplicationConfig,
     private val kafkaProducerService: KafkaProducerService,
-    private val smtpTransportClient: SmtpTransportClient
+    private val smtpTransportClient: SmtpTransportClient,
+    private val encrypting: Encrypting = Encrypting()
 ) {
 
     private val log = LoggerFactory.getLogger(SendEbxmlMessageAsyncUseCase::class.java)
@@ -35,13 +37,17 @@ class SendEbxmlMessageAsyncUseCase(
                 log.info("Storing ASYNC payload in SMTP DB")
                 val contentId = payload.contentId.removePrefix("cid:")
                 withContext(Dispatchers.IO) {
+
+                    // hvis det kommer med async meldingstyper som ikke skal krypteres, må vi ha et flagg som for signering
+                    log.info("Encrypting ASYNC payload")
+                    val encrypted = encrypting.encrypt(payload.bytes)
                     smtpTransportClient.storePayload(
                         listOf(
                             PayloadDto(
                                 referenceId = requestDto.messageId,
                                 contentId = contentId,
                                 contentType = payload.contentType,
-                                content = payload.bytes
+                                content = encrypted
                             )
                         )
                     )
