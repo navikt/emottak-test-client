@@ -11,12 +11,37 @@ import kotlinx.serialization.json.Json
 import no.nav.emottak.test.client.application.ebxml.usecases.EbxmlPayload
 import no.nav.emottak.test.client.application.ebxml.usecases.EbxmlRequest
 import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageUseCase
+import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageViaKafkaUseCase
 import no.nav.emottak.test.client.domain.EbxmlResult
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
-fun Routing.sendEbxmlMessageRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCase) {
+fun Routing.sendEbxmlMessageRoute(
+    sendEbxmlMessageUseCase: SendEbxmlMessageUseCase,
+    sendEbxmlMessageViaKafkaUseCase: SendEbxmlMessageViaKafkaUseCase? = null
+) {
     val log = LoggerFactory.getLogger("no.nav.emottak.test.client.adapters.ebxml.controller.sendEbxmlMessageRoute")
+
+    if (sendEbxmlMessageViaKafkaUseCase != null) {
+        post("/ebxml/send-kafka") {
+            try {
+                val requestBody = call.receiveText()
+                log.debug("/ebxml/send-kafka request received: $requestBody")
+
+                val dto = Json.decodeFromString<EbxmlRequestDto>(requestBody)
+                val ebxmlRequest = dto.toDomain()
+
+                val result = sendEbxmlMessageViaKafkaUseCase.sendEbxmlMessageViaKafka(ebxmlRequest)
+
+                when (result) {
+                    is EbxmlResult.Success -> call.respond(HttpStatusCode.OK, result)
+                    is EbxmlResult.Failure -> call.respond(HttpStatusCode.BadRequest, result)
+                }
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, mapOf("error" to e.message))
+            }
+        }
+    }
 
     post("/ebxml/send-cpa") {
         try {

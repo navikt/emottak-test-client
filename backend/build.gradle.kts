@@ -78,6 +78,7 @@ dependencies {
     implementation("no.nav.emottak:emottak-payload-xsd:0.0.11")
     implementation("no.nav.emottak:ebxml-protokoll:0.0.7")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
     implementation("org.apache.santuario:xmlsec:3.0.3")
 
@@ -85,6 +86,7 @@ dependencies {
     implementation("io.insert-koin:koin-core")
 
     implementation("com.sksamuel.hoplite:hoplite-core:2.8.2")
+    implementation("com.sksamuel.hoplite:hoplite-hocon:2.8.2")
     implementation("com.sksamuel.hoplite:hoplite-yaml:2.8.2")
 
     implementation("io.arrow-kt:arrow-core:2.1.0")

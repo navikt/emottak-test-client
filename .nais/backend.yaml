@@ -19,6 +19,8 @@ spec:
     requests:
       cpu: "50m"
       memory: "256Mi"
+  kafka:
+    pool: nav-dev
   accessPolicy:
     inbound:
       rules:
