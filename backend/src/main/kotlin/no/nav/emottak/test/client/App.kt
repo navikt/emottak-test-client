@@ -19,7 +19,9 @@ import io.ktor.server.routing.routing
 import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.awaitCancellation
 import no.nav.emottak.test.client.adapters.ebxml.controller.sendEbxmlMessageRoute
+import no.nav.emottak.test.client.adapters.ebxml.kafka.EbxmlKafkaProducer
 import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageUseCase
+import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageViaKafkaUseCase
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.config.applicationConfig
 import no.nav.emottak.test.client.infrastructure.plugins.configureSerialization
@@ -56,7 +58,8 @@ fun Application.testClientModule() {
 
     val applicationConfig: ApplicationConfig = applicationConfig()
     val sendEbxmlMessageUseCase = createSendEbxmlMessageUseCase(applicationConfig)
-    registerSendEbxmlMessageRoute(sendEbxmlMessageUseCase)
+    val sendEbxmlMessageViaKafkaUseCase = createSendEbxmlMessageViaKafkaUseCase(applicationConfig)
+    registerSendEbxmlMessageRoute(sendEbxmlMessageUseCase, sendEbxmlMessageViaKafkaUseCase)
 
     configureHelloWorldRouting()
 }
@@ -71,9 +74,17 @@ private fun createSendEbxmlMessageUseCase(applicationConfig: ApplicationConfig):
     return SendEbxmlMessageUseCase(applicationConfig, httpClient)
 }
 
-private fun Application.registerSendEbxmlMessageRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCase) {
+private fun createSendEbxmlMessageViaKafkaUseCase(applicationConfig: ApplicationConfig): SendEbxmlMessageViaKafkaUseCase {
+    val kafkaProducer = EbxmlKafkaProducer(applicationConfig.kafka, applicationConfig.payloadTopic)
+    return SendEbxmlMessageViaKafkaUseCase(applicationConfig, kafkaProducer)
+}
+
+private fun Application.registerSendEbxmlMessageRoute(
+    sendEbxmlMessageUseCase: SendEbxmlMessageUseCase,
+    sendEbxmlMessageViaKafkaUseCase: SendEbxmlMessageViaKafkaUseCase
+) {
     routing {
-        sendEbxmlMessageRoute(sendEbxmlMessageUseCase)
+        sendEbxmlMessageRoute(sendEbxmlMessageUseCase, sendEbxmlMessageViaKafkaUseCase)
     }
 }
 
