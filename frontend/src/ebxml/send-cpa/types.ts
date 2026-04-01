@@ -11,6 +11,7 @@ export interface EbxmlRequest {
   ebxmlPayload?: EbxmlPayload;
   signPayload: boolean;
   useNewEmottakFlow: boolean;
+  sendAsync: boolean;
 }
 
 export interface EbxmlPayload {

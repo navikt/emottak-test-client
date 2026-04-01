@@ -8,3 +8,6 @@ signing:
 server:
   port: 13001
   preWait: "5s"
+kafka:
+  bootstrapServers: ${KAFKA_BROKERS:-localhost:9092}
+  topic: ${KAFKA_TOPIC:-team-emottak.smtp.in.ebxml.payload}

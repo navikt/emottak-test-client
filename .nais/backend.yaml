@@ -37,3 +37,6 @@ spec:
       value: DEBUG
     - name: KEYSTORE_FILE_SIGN_2025_PATH
       value: /var/run/secrets/ebms-keystore-2025/nav_signing_test.p12
+  kafka:
+    pool: nav-dev
+    streams: false
