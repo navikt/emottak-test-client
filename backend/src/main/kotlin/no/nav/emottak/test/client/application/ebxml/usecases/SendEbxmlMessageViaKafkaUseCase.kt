@@ -23,11 +23,19 @@ class SendEbxmlMessageViaKafkaUseCase(
             val signedDoc = builder.buildAndSign()
 
             val envelopeBytes = signedDoc.asByteArray()
-            val attachmentBytes = builder.payload?.bytes
+            val attachments = builder.payload?.let { payload ->
+                listOf(
+                    Attachment(
+                        content = payload.bytes,
+                        contentId = payload.contentId,
+                        contentType = payload.contentType
+                    )
+                )
+            }.orEmpty()
 
             val soapWithAttachments = SoapWithAttachments(
                 envelope = envelopeBytes,
-                attachment = attachmentBytes
+                attachments = attachments
             )
 
             val key = UUID.randomUUID().toString()
@@ -47,23 +55,17 @@ class SendEbxmlMessageViaKafkaUseCase(
 @Serializable
 data class SoapWithAttachments(
     val envelope: ByteArray,
-    val attachment: ByteArray? = null
+    val attachments: List<Attachment> = emptyList()
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as SoapWithAttachments
-
-        if (!envelope.contentEquals(other.envelope)) return false
-        if (!attachment.contentEquals(other.attachment)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = envelope.contentHashCode()
-        result = 31 * result + (attachment?.contentHashCode() ?: 0)
-        return result
+    companion object {
+        const val MESSAGE_FORMAT_HEADER = "messageFormat"
+        const val MESSAGE_FORMAT_VALUE = "SoapWithAttachments"
     }
 }
+
+@Serializable
+data class Attachment(
+    val content: ByteArray,
+    val contentId: String,
+    val contentType: String
+)
