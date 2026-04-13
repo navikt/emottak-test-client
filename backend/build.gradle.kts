@@ -2,6 +2,7 @@ val kotlin_version: String by project
 val logback_version: String by project
 val ktor_version: String by project
 val koin_version: String by project
+val kafka_version: String by project
 
 plugins {
     kotlin("jvm") version "2.2.21"
@@ -81,6 +82,7 @@ dependencies {
 
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
     implementation("org.apache.santuario:xmlsec:3.0.3")
+    implementation("org.apache.kafka:kafka-clients:$kafka_version")
 
     implementation(platform("io.insert-koin:koin-bom:$koin_version"))
     implementation("io.insert-koin:koin-core")
