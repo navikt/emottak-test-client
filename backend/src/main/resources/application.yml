@@ -1,5 +1,6 @@
 hostName: ${NAIS_CLUSTER_NAME:-local}
 ebmsSyncRouterUrl: "https://ebms-sync-router.intern.dev.nav.no/ebxml/msh"
+smtpTransportUrl: ${SMTP_TRANSPORT_URL:-http://smtp-transport}
 alias: "ARBEIDS- OG VELFERDSETATEN"
 signing:
   key: ${VIRKSOMHETSSERTIFIKAT_SIGNERING}
@@ -8,3 +9,6 @@ signing:
 server:
   port: 13001
   preWait: "5s"
+kafka:
+  bootstrapServers: ${KAFKA_BROKERS:-localhost:9092}
+  topic: ${KAFKA_TOPIC:-team-emottak.smtp.in.ebxml.payload}
