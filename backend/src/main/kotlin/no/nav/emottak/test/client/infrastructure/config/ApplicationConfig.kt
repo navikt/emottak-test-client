@@ -4,11 +4,13 @@ import com.sksamuel.hoplite.ConfigLoader
 import com.sksamuel.hoplite.ExperimentalHoplite
 import com.sksamuel.hoplite.addEnvironmentSource
 import com.sksamuel.hoplite.addResourceSource
+import no.nav.emottak.utils.config.Kafka
 import no.nav.emottak.utils.config.Server
 
 @OptIn(ExperimentalHoplite::class)
 fun applicationConfig() = ConfigLoader.builder()
     .addEnvironmentSource()
+    .addResourceSource("/kafka_common.conf")
     .addResourceSource("/application.yml")
     .withExplicitSealedTypes()
     .build()
@@ -18,6 +20,8 @@ data class ApplicationConfig(
     val hostName: String,
     val ebmsSyncRouterUrl: String,
     val signing: SigningConfig,
+    val kafka: Kafka,
+    val payloadTopic: String,
     val server: Server
 )
 
