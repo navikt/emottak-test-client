@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import no.nav.emottak.test.client.adapters.ebxml.kafka.EbxmlKafkaProducer
 import no.nav.emottak.test.client.application.ebxml.usecases.builders.EbxmlDocumentBuilder
 import no.nav.emottak.test.client.domain.EbxmlResult
+import no.nav.emottak.test.client.domain.Payload
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.xml.asByteArray
 import org.slf4j.LoggerFactory
@@ -22,20 +23,9 @@ class SendEbxmlMessageViaKafkaUseCase(
             val builder = EbxmlDocumentBuilder(applicationConfig, requestDto)
             val signedDoc = builder.buildAndSign()
 
-            val envelopeBytes = signedDoc.asByteArray()
-            val attachments = builder.payload?.let { payload ->
-                listOf(
-                    Attachment(
-                        content = payload.bytes,
-                        contentId = payload.contentId,
-                        contentType = payload.contentType
-                    )
-                )
-            }.orEmpty()
-
-            val soapWithAttachments = SoapWithAttachments(
-                envelope = envelopeBytes,
-                attachments = attachments
+            val soapWithAttachments = createSoapWithAttachments(
+                envelope = signedDoc.asByteArray(),
+                payload = builder.payload
             )
 
             val key = UUID.randomUUID().toString()
@@ -51,6 +41,19 @@ class SendEbxmlMessageViaKafkaUseCase(
         }
     }
 }
+
+internal fun createSoapWithAttachments(envelope: ByteArray, payload: Payload?): SoapWithAttachments = SoapWithAttachments(
+    envelope = envelope,
+    attachments = payload?.let {
+        listOf(
+            Attachment(
+                content = it.bytes,
+                contentId = it.contentId,
+                contentType = it.contentType
+            )
+        )
+    }.orEmpty()
+)
 
 @Serializable
 data class SoapWithAttachments(
