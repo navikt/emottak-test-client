@@ -160,6 +160,7 @@ data class EbxmlRequest(
     val timestamp: String = Instant.now().toString(),
     val ebxmlPayload: EbxmlPayload? = null,
     val signPayload: Boolean? = false,
+    val encryptPayload: Boolean? = false,
     val useNewEmottakFlow: Boolean = true
 )
 
