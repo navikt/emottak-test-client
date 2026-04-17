@@ -10,12 +10,16 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.nav.emottak.test.client.application.ebxml.usecases.EbxmlPayload
 import no.nav.emottak.test.client.application.ebxml.usecases.EbxmlRequest
+import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageAsyncUseCase
 import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageUseCase
 import no.nav.emottak.test.client.domain.EbxmlResult
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
-fun Routing.sendEbxmlMessageRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCase) {
+fun Routing.sendEbxmlMessageRoute(
+    sendEbxmlMessageUseCase: SendEbxmlMessageUseCase,
+    sendEbxmlMessageAsyncUseCase: SendEbxmlMessageAsyncUseCase
+) {
     val log = LoggerFactory.getLogger("no.nav.emottak.test.client.adapters.ebxml.controller.sendEbxmlMessageRoute")
 
     post("/ebxml/send-cpa") {
@@ -26,7 +30,11 @@ fun Routing.sendEbxmlMessageRoute(sendEbxmlMessageUseCase: SendEbxmlMessageUseCa
             val dto = Json.decodeFromString<EbxmlRequestDto>(requestBody)
             val ebxmlRequest = dto.toDomain()
 
-            val result = sendEbxmlMessageUseCase.sendEbxmlMessage(ebxmlRequest)
+            val result = if (dto.sendAsync) {
+                sendEbxmlMessageAsyncUseCase.sendEbxmlMessage(ebxmlRequest)
+            } else {
+                sendEbxmlMessageUseCase.sendEbxmlMessage(ebxmlRequest)
+            }
 
             log.debug("/ebxml/send-cpa is returning response: {}", result)
 
@@ -57,7 +65,9 @@ data class EbxmlRequestDto(
     val action: String,
     val ebxmlPayload: PayloadDto? = null,
     val signPayload: Boolean = false,
-    val useNewEmottakFlow: Boolean = true
+    val encryptPayload: Boolean = false,
+    val useNewEmottakFlow: Boolean = true,
+    val sendAsync: Boolean = false
 ) {
     @Serializable
     data class PayloadDto(
@@ -77,6 +87,7 @@ data class EbxmlRequestDto(
             service = service,
             action = action,
             signPayload = signPayload,
+            encryptPayload = encryptPayload,
             useNewEmottakFlow = useNewEmottakFlow,
             ebxmlPayload = ebxmlPayload?.let {
                 EbxmlPayload(

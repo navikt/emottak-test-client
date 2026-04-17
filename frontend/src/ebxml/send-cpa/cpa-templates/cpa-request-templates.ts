@@ -4,6 +4,7 @@ import { EbxmlRequest } from "@/ebxml/send-cpa/types";
 import {
   pasientlisteForesporselHentPasientlisteWithHelseIdRequest
 } from "@/ebxml/send-cpa/cpa-templates/cpa-requests/pasientlisteforesporsel-hentpasientliste-request-with-helseid";
+import {trekkopplysningInnmelding} from "@/ebxml/send-cpa/cpa-templates/cpa-requests/trekkopplysning-innmelding";
 
 export type CpaRequestTemplate = {
   type: string;
@@ -26,5 +27,10 @@ export const cpaRequestTemplates: CpaRequestTemplate[] = [
     type: "Pasientliste",
     name: "HentPasientliste med HelseID",
     value: pasientlisteForesporselHentPasientlisteWithHelseIdRequest,
+  },
+  {
+    type: "Trekkopplysning",
+    name: "Trekkopplysning Innmelding",
+    value: trekkopplysningInnmelding,
   },
 ];
