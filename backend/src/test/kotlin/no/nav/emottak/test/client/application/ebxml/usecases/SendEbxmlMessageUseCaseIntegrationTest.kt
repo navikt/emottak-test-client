@@ -108,5 +108,4 @@ class SendEbxmlMessageUseCaseIntegrationTest : FunSpec({
 
         result.shouldBeInstanceOf<EbxmlResult.Success>()
     }
-
 })
