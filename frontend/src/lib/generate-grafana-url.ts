@@ -1,47 +1,47 @@
-const GRAFANA_BASE_URL = process.env.NEXT_PUBLIC_GRAFANA_BASE_URL ?? "https://grafana.nav.cloud.nais.io/";
-const GRAFANA_ORG_ID = process.env.NEXT_PUBLIC_GRAFANA_ORG_ID ?? "1";
-const GRAFANA_LOKI_DATASOURCE_UID = process.env.NEXT_PUBLIC_GRAFANA_LOKI_DATASOURCE_UID ?? "";
+const GRAFANA_BASE_URL = process.env.NEXT_PUBLIC_GRAFANA_BASE_URL ?? "https://grafana.nav.cloud.nais.io";
+const GRAFANA_LOKI_DATASOURCE_UID =
+  process.env.NEXT_PUBLIC_GRAFANA_LOKI_DATASOURCE_UID ?? "P7BE696147D279490";
+const GRAFANA_SERVICE_NAME = process.env.NEXT_PUBLIC_GRAFANA_SERVICE_NAME ?? "";
 const GRAFANA_CLUSTER = process.env.NEXT_PUBLIC_GRAFANA_CLUSTER ?? "dev-fss";
+const GRAFANA_TIME_FROM = process.env.NEXT_PUBLIC_GRAFANA_TIME_FROM ?? "now-15m";
+const GRAFANA_TIME_TO = process.env.NEXT_PUBLIC_GRAFANA_TIME_TO ?? "now";
 
-function buildLokiQuery(conversationId: string) {
-  return `{cluster="${GRAFANA_CLUSTER}"} |= "${conversationId}"`;
+function getGrafanaBaseUrl() {
+  return GRAFANA_BASE_URL.replace(/\/+$/, "");
 }
 
 export function generateGrafanaURLFromConversationId(conversationId: string) {
-  if (!conversationId) {
-    return `${GRAFANA_BASE_URL}/explore`;
-  }
-
-  if (!GRAFANA_LOKI_DATASOURCE_UID) {
-    return `${GRAFANA_BASE_URL}/explore?orgId=${encodeURIComponent(GRAFANA_ORG_ID)}`;
-  }
-
-  const panes = {
-    A: {
-      datasource: GRAFANA_LOKI_DATASOURCE_UID,
-      queries: [
-        {
-          refId: "A",
-          datasource: {
-            uid: GRAFANA_LOKI_DATASOURCE_UID,
-            type: "loki",
-          },
-          expr: buildLokiQuery(conversationId),
-          queryType: "range",
-        },
-      ],
-      range: {
-        from: "now-15h",
-        to: "now",
-      },
-    },
-  };
-
+  const grafanaBaseUrl = getGrafanaBaseUrl();
+  const routeServiceName = GRAFANA_SERVICE_NAME || "all";
+  const filters = GRAFANA_SERVICE_NAME
+    ? `service_name|=|${GRAFANA_SERVICE_NAME}`
+    : `k8s_cluster_name|=|${GRAFANA_CLUSTER}`;
   const params = new URLSearchParams({
-    orgId: GRAFANA_ORG_ID,
-    schemaVersion: "1",
-    panes: JSON.stringify(panes),
+    patterns: "[]",
+    from: GRAFANA_TIME_FROM,
+    to: GRAFANA_TIME_TO,
+    "var-lineFormat": "",
+    "var-ds": GRAFANA_LOKI_DATASOURCE_UID,
+    "var-filters": filters,
+    "var-fields": "",
+    "var-levels": "",
+    "var-metadata": "",
+    "var-jsonFields": "",
+    "var-patterns": "",
+    "var-lineFilterV2": "",
+    "var-lineFilters": conversationId
+      ? `caseInsensitive,0|__gfp__=|${conversationId}`
+      : "",
+    timezone: "browser",
+    "var-all-fields": "",
+    userDisplayedFields: "false",
+    displayedFields: "[]",
+    urlColumns: "[]",
+    visualizationType: '"logs"',
+    prettifyLogMessage: "false",
+    sortOrder: '"Descending"',
+    wrapLogMessage: "false",
   });
 
-  return `${GRAFANA_BASE_URL}/explore?${params.toString()}`;
+  return `${grafanaBaseUrl}/a/grafana-lokiexplore-app/explore/service_name/${encodeURIComponent(routeServiceName)}/logs?${params.toString()}`;
 }
