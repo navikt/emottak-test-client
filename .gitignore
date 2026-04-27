@@ -1,4 +1,5 @@
 # app sepcific
+.DS_Store
 
 # Contains necessary credentials for integration testing in dev
 application-test.yml

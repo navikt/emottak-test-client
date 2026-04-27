@@ -20,13 +20,19 @@ data class ApplicationConfig(
     val smtpTransportUrl: String,
     val signing: SigningConfig,
     val server: Server,
-    val kafka: KafkaConfig = KafkaConfig()
+    val kafka: KafkaConfig = KafkaConfig(),
+    val kafkaOut: KafkaOutConfig = KafkaOutConfig()
 )
 
 data class SigningConfig(
     val key: String,
     val password: String,
     val path: String
+)
+
+data class KafkaOutConfig(
+    val bootstrapServers: String = "localhost:9092",
+    val topic: String = "team-emottak.smtp.out.ebxml.payload"
 )
 
 data class KafkaConfig(
