@@ -90,7 +90,6 @@ dependencies {
     implementation("io.insert-koin:koin-core")
 
     implementation("com.sksamuel.hoplite:hoplite-core:2.8.2")
-    implementation("com.sksamuel.hoplite:hoplite-hocon:2.8.2")
     implementation("com.sksamuel.hoplite:hoplite-yaml:2.8.2")
 
     implementation("io.arrow-kt:arrow-core:2.1.0")
