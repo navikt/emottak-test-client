@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import CodeMirror from "@uiw/react-codemirror";
 import { xml } from "@codemirror/lang-xml";
 import { githubLight } from "@uiw/codemirror-theme-github";
-import { generateKibanaURLFromConversationId } from "@/lib/generate-kibana-url";
+import {generateGrafanaURLFromConversationId} from "@/lib/generate-grafana-url";
 import { v4 as uuidv4 } from "uuid";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -107,7 +107,7 @@ export default function EbxmlForm() {
     }
   };
 
-  const kibanaLogUrl = generateKibanaURLFromConversationId(lastUsedConversationId);
+  const grafanaLogUrl = generateGrafanaURLFromConversationId(lastUsedConversationId);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -317,8 +317,8 @@ export default function EbxmlForm() {
                 Success
               </div>
               <div className="px-4 py-2 border-t border-border text-sm text-muted-foreground">
-                <a target="_blank" href={kibanaLogUrl} className="underline">
-                  View Logs in Kibana
+                <a target="_blank" href={grafanaLogUrl} className="underline">
+                  View Logs in Grafana
                 </a>
               </div>
 
@@ -381,8 +381,8 @@ export default function EbxmlForm() {
                 Error
               </div>
               <div>
-                <a target="_blank" href={kibanaLogUrl}>
-                  View Logs in Kibana
+                <a target="_blank" href={grafanaLogUrl}>
+                  View Logs in Grafana
                 </a>
               </div>
               <Alert variant="destructive">{error}</Alert>
