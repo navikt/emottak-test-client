@@ -33,8 +33,10 @@ import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.serialization.json.Json
 import no.nav.emottak.test.client.adapters.ebxml.controller.sendEbxmlMessageRoute
+import no.nav.emottak.test.client.adapters.ebxml.kafka.EbxmlKafkaProducer
 import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageAsyncUseCase
 import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageUseCase
+import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageViaKafkaUseCase
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.config.applicationConfig
 import no.nav.emottak.test.client.infrastructure.kafka.KafkaProducerService
@@ -79,6 +81,7 @@ fun Application.testClientModule() {
 
     val applicationConfig: ApplicationConfig = applicationConfig()
     val sendEbxmlMessageUseCase = createSendEbxmlMessageUseCase(applicationConfig)
+    val sendEbxmlMessageViaKafkaUseCase = createSendEbxmlMessageViaKafkaUseCase(applicationConfig)
     val kafkaProducerService = KafkaProducerService(applicationConfig.kafka.bootstrapServers)
     val smtpTransportClient = createSmtpTransportClient(applicationConfig)
     val sendEbxmlMessageAsyncUseCase = SendEbxmlMessageAsyncUseCase(
@@ -87,7 +90,11 @@ fun Application.testClientModule() {
         smtpTransportClient
     )
 
-    registerSendEbxmlMessageRoute(sendEbxmlMessageUseCase, sendEbxmlMessageAsyncUseCase)
+    registerSendEbxmlMessageRoute(
+        sendEbxmlMessageUseCase,
+        sendEbxmlMessageViaKafkaUseCase,
+        sendEbxmlMessageAsyncUseCase
+    )
     configureHelloWorldRouting()
 }
 
@@ -101,6 +108,11 @@ private fun createSendEbxmlMessageUseCase(applicationConfig: ApplicationConfig):
     return SendEbxmlMessageUseCase(applicationConfig, httpClient)
 }
 
+private fun createSendEbxmlMessageViaKafkaUseCase(applicationConfig: ApplicationConfig): SendEbxmlMessageViaKafkaUseCase {
+    val kafkaProducer = EbxmlKafkaProducer(applicationConfig.kafkaOut)
+    return SendEbxmlMessageViaKafkaUseCase(applicationConfig, kafkaProducer)
+}
+
 private fun createSmtpTransportClient(applicationConfig: ApplicationConfig): SmtpTransportClient {
     val httpClientProvider = scopedAuthHttpClient(SMTP_TRANSPORT_SCOPE)
     return SmtpTransportClient(applicationConfig.smtpTransportUrl, httpClientProvider.invoke())
@@ -108,10 +120,15 @@ private fun createSmtpTransportClient(applicationConfig: ApplicationConfig): Smt
 
 private fun Application.registerSendEbxmlMessageRoute(
     sendEbxmlMessageUseCase: SendEbxmlMessageUseCase,
+    sendEbxmlMessageViaKafkaUseCase: SendEbxmlMessageViaKafkaUseCase,
     sendEbxmlMessageAsyncUseCase: SendEbxmlMessageAsyncUseCase
 ) {
     routing {
-        sendEbxmlMessageRoute(sendEbxmlMessageUseCase, sendEbxmlMessageAsyncUseCase)
+        sendEbxmlMessageRoute(
+            sendEbxmlMessageUseCase,
+            sendEbxmlMessageViaKafkaUseCase,
+            sendEbxmlMessageAsyncUseCase
+        )
     }
 }
 
