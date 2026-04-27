@@ -17,12 +17,19 @@ fun applicationConfig() = ConfigLoader.builder()
 data class ApplicationConfig(
     val hostName: String,
     val ebmsSyncRouterUrl: String,
+    val smtpTransportUrl: String,
     val signing: SigningConfig,
-    val server: Server
+    val server: Server,
+    val kafka: KafkaConfig = KafkaConfig()
 )
 
 data class SigningConfig(
     val key: String,
     val password: String,
     val path: String
+)
+
+data class KafkaConfig(
+    val bootstrapServers: String = "localhost:9092",
+    val topic: String = "team-emottak.smtp.in.ebxml.payload"
 )
