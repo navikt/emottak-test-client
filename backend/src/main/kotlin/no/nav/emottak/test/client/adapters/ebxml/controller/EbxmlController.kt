@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.nav.emottak.test.client.application.ebxml.usecases.EbxmlPayload
 import no.nav.emottak.test.client.application.ebxml.usecases.EbxmlRequest
+import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageAsyncUseCase
 import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageUseCase
 import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageViaKafkaUseCase
 import no.nav.emottak.test.client.domain.EbxmlResult
@@ -18,28 +19,27 @@ import java.util.UUID
 
 fun Routing.sendEbxmlMessageRoute(
     sendEbxmlMessageUseCase: SendEbxmlMessageUseCase,
-    sendEbxmlMessageViaKafkaUseCase: SendEbxmlMessageViaKafkaUseCase? = null
+    sendEbxmlMessageViaKafkaUseCase: SendEbxmlMessageViaKafkaUseCase,
+    sendEbxmlMessageAsyncUseCase: SendEbxmlMessageAsyncUseCase
 ) {
     val log = LoggerFactory.getLogger("no.nav.emottak.test.client.adapters.ebxml.controller.sendEbxmlMessageRoute")
 
-    if (sendEbxmlMessageViaKafkaUseCase != null) {
-        post("/ebxml/send-kafka") {
-            try {
-                val requestBody = call.receiveText()
-                log.debug("/ebxml/send-kafka request received: $requestBody")
+    post("/ebxml/send-kafka") {
+        try {
+            val requestBody = call.receiveText()
+            log.debug("/ebxml/send-kafka request received: $requestBody")
 
-                val dto = Json.decodeFromString<EbxmlRequestDto>(requestBody)
-                val ebxmlRequest = dto.toDomain()
+            val dto = Json.decodeFromString<EbxmlRequestDto>(requestBody)
+            val ebxmlRequest = dto.toDomain()
 
-                val result = sendEbxmlMessageViaKafkaUseCase.sendEbxmlMessageViaKafka(ebxmlRequest)
+            val result = sendEbxmlMessageViaKafkaUseCase.sendEbxmlMessageViaKafka(ebxmlRequest)
 
-                when (result) {
-                    is EbxmlResult.Success -> call.respond(HttpStatusCode.OK, result)
-                    is EbxmlResult.Failure -> call.respond(HttpStatusCode.BadRequest, result)
-                }
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, mapOf("error" to e.message))
+            when (result) {
+                is EbxmlResult.Success -> call.respond(HttpStatusCode.OK, result)
+                is EbxmlResult.Failure -> call.respond(HttpStatusCode.BadRequest, result)
             }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, mapOf("error" to e.message))
         }
     }
 
@@ -51,7 +51,11 @@ fun Routing.sendEbxmlMessageRoute(
             val dto = Json.decodeFromString<EbxmlRequestDto>(requestBody)
             val ebxmlRequest = dto.toDomain()
 
-            val result = sendEbxmlMessageUseCase.sendEbxmlMessage(ebxmlRequest)
+            val result = if (dto.sendAsync) {
+                sendEbxmlMessageAsyncUseCase.sendEbxmlMessage(ebxmlRequest)
+            } else {
+                sendEbxmlMessageUseCase.sendEbxmlMessage(ebxmlRequest)
+            }
 
             log.debug("/ebxml/send-cpa is returning response: {}", result)
 
@@ -82,7 +86,9 @@ data class EbxmlRequestDto(
     val action: String,
     val ebxmlPayload: PayloadDto? = null,
     val signPayload: Boolean = false,
-    val useNewEmottakFlow: Boolean = true
+    val encryptPayload: Boolean = false,
+    val useNewEmottakFlow: Boolean = true,
+    val sendAsync: Boolean = false
 ) {
     @Serializable
     data class PayloadDto(
@@ -102,6 +108,7 @@ data class EbxmlRequestDto(
             service = service,
             action = action,
             signPayload = signPayload,
+            encryptPayload = encryptPayload,
             useNewEmottakFlow = useNewEmottakFlow,
             ebxmlPayload = ebxmlPayload?.let {
                 EbxmlPayload(

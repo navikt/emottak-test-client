@@ -6,6 +6,10 @@ metadata:
   labels:
     team: team-emottak
 spec:
+  azure:
+    application:
+      enabled: true
+      allowAllUsers: true
   ingresses:
     - https://emottak-test-client-backend.intern.dev.nav.no
   image: {{image}}
@@ -28,6 +32,7 @@ spec:
     outbound:
       rules:
         - application: emottak-test-client
+        - application: smtp-transport
   envFrom:
     - secret: emottak-test-client
     - secret: ebms-keystore-pwd-2025
