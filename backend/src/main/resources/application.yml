@@ -3,7 +3,7 @@ ebmsSyncRouterUrl: "https://ebms-sync-router.intern.dev.nav.no/ebxml/msh"
 smtpTransportUrl: ${SMTP_TRANSPORT_URL:-http://smtp-transport}
 alias: "ARBEIDS- OG VELFERDSETATEN"
 signing:
-  key: ${VIRKSOMHETSSERTIFIKAT_SIGNERING:-}
+  key: ${VIRKSOMHETSSERTIFIKAT_SIGNERING}
   password: ${KEYSTORE_PWD_2025}
   path: ${KEYSTORE_FILE_SIGN_2025_PATH}
 server:
