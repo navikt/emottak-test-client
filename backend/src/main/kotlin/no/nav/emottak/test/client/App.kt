@@ -75,7 +75,7 @@ private fun createSendEbxmlMessageUseCase(applicationConfig: ApplicationConfig):
 }
 
 private fun createSendEbxmlMessageViaKafkaUseCase(applicationConfig: ApplicationConfig): SendEbxmlMessageViaKafkaUseCase {
-    val kafkaProducer = EbxmlKafkaProducer(applicationConfig.kafka, applicationConfig.payloadTopic)
+    val kafkaProducer = EbxmlKafkaProducer(applicationConfig.kafkaOut)
     return SendEbxmlMessageViaKafkaUseCase(applicationConfig, kafkaProducer)
 }
 

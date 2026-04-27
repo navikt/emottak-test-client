@@ -1,7 +1,6 @@
 package no.nav.emottak.test.client.adapters.ebxml.kafka
 
-import no.nav.emottak.utils.config.Kafka
-import no.nav.emottak.utils.config.toProperties
+import no.nav.emottak.test.client.infrastructure.config.KafkaOutConfig
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -14,7 +13,7 @@ import java.util.Properties
 const val MESSAGE_FORMAT_HEADER = "messageFormat"
 const val SOAP_WITH_ATTACHMENTS_FORMAT = "SoapWithAttachments"
 
-class EbxmlKafkaProducer(private val kafka: Kafka, private val topic: String) {
+class EbxmlKafkaProducer(private val kafka: KafkaOutConfig) {
 
     private val log = LoggerFactory.getLogger(EbxmlKafkaProducer::class.java)
 
@@ -24,7 +23,7 @@ class EbxmlKafkaProducer(private val kafka: Kafka, private val topic: String) {
 
     fun sendSoapWithAttachments(key: String, value: ByteArray) {
         val record = ProducerRecord(
-            topic,
+            kafka.topic,
             null,
             key,
             value,
@@ -47,7 +46,7 @@ class EbxmlKafkaProducer(private val kafka: Kafka, private val topic: String) {
         producer.flush()
     }
 
-    private fun producerProperties(): Properties = kafka.toProperties().apply {
+    private fun producerProperties(): Properties = Properties().apply {
         put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.bootstrapServers)
         put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java.name)
         put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer::class.java.name)

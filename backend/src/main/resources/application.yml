@@ -5,7 +5,9 @@ signing:
   key: ${VIRKSOMHETSSERTIFIKAT_SIGNERING}
   password: ${KEYSTORE_PWD_2025}
   path: ${KEYSTORE_FILE_SIGN_2025_PATH}
-payloadTopic: ${KAFKA_PAYLOAD_TOPIC:-team-emottak.smtp.out.ebxml.payload}
 server:
   port: 13001
   preWait: "5s"
+kafkaOut:
+  bootstrapServers: ${KAFKA_BROKERS:-localhost:9092}
+  topic: ${KAFKA_PAYLOAD_TOPIC:-team-emottak.smtp.out.ebxml.payload}
