@@ -14,12 +14,12 @@ export type CpaRequestTemplate = {
 export const cpaRequestTemplates: CpaRequestTemplate[] = [
   {
     type: "Frikort",
-    name: "EgenandelForesporsel",
+    name: "EgenandelForesporsel 1",
     value: frikortEgenandelForesporselRequest,
   },
   {
     type: "FrikortMengde",
-    name: "EgenandelForesporsel",
+    name: "EgenandelForesporsel flere",
     value: frikortMengdeEgenandelForesporselRequest,
   },
   {
