@@ -1,6 +1,9 @@
 import { frikortEgenandelForesporselRequest } from "@/ebxml/send-cpa/cpa-templates/cpa-requests/frikort-egenandelforesporsel-request";
 import { EbxmlRequest } from "@/ebxml/send-cpa/types";
 import {trekkopplysningInnmelding} from "@/ebxml/send-cpa/cpa-templates/cpa-requests/trekkopplysning-innmelding";
+import {
+    frikortMengdeEgenandelForesporselRequest
+} from "@/ebxml/send-cpa/cpa-templates/cpa-requests/frikortmengde-egenandelforesporsel-request";
 
 export type CpaRequestTemplate = {
   type: string;
@@ -11,8 +14,13 @@ export type CpaRequestTemplate = {
 export const cpaRequestTemplates: CpaRequestTemplate[] = [
   {
     type: "Frikort",
-    name: "EgenandelForesporsel",
+    name: "EgenandelForesporsel 1",
     value: frikortEgenandelForesporselRequest,
+  },
+  {
+    type: "FrikortMengde",
+    name: "EgenandelForesporsel flere",
+    value: frikortMengdeEgenandelForesporselRequest,
   },
   {
     type: "Trekkopplysning",
