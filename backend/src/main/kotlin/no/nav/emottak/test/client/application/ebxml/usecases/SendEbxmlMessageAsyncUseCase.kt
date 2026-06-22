@@ -18,6 +18,7 @@ import no.nav.emottak.utils.common.model.Party
 import no.nav.emottak.utils.common.model.PartyId
 import no.nav.emottak.utils.common.model.SendInRequest
 import org.slf4j.LoggerFactory
+import java.util.Base64
 
 class SendEbxmlMessageAsyncUseCase(
     private val applicationConfig: ApplicationConfig,
@@ -92,12 +93,14 @@ class SendEbxmlMessageAsyncUseCase(
             log.info("Validating ASYNC request")
             validateRequestDto(requestDto)
 
-            val builder = EbxmlDocumentBuilder(applicationConfig, requestDto)
+            val payload: ByteArray = Base64.getDecoder().decode(requestDto.ebxmlPayload!!.base64Content.trim())
+            val contentId = requestDto.ebxmlPayload.contentId
+
             val sendInRequest = SendInRequest(
                 messageId = requestDto.messageId,
                 conversationId = requestDto.conversationId,
-                payloadId = builder.payload!!.contentId.removePrefix("cid:"),
-                payload = builder.payload.bytes,
+                payloadId = contentId.removePrefix("cid:"),
+                payload = payload,
                 addressing = Addressing(
                     Party(listOf(PartyId("HER", requestDto.toPartyId)), requestDto.toRole),
                     Party(listOf(PartyId("HER", requestDto.fromPartyId)), requestDto.fromRole),
