@@ -99,8 +99,8 @@ class SendEbxmlMessageAsyncUseCase(
                 payloadId = builder.payload!!.contentId.removePrefix("cid:"),
                 payload = builder.payload.bytes,
                 addressing = Addressing(
-                    Party(listOf(PartyId("HER", requestDto.fromPartyId)), requestDto.fromRole),
                     Party(listOf(PartyId("HER", requestDto.toPartyId)), requestDto.toRole),
+                    Party(listOf(PartyId("HER", requestDto.fromPartyId)), requestDto.fromRole),
                     requestDto.service,
                     requestDto.action
                 ),
@@ -111,7 +111,9 @@ class SendEbxmlMessageAsyncUseCase(
                 partnerId = 0L // ikke i bruk
             )
             val key = sendInRequest.requestId
-            val value = Json.encodeToString<SendInRequest>(sendInRequest).toByteArray()
+            val json = Json.encodeToString<SendInRequest>(sendInRequest)
+            log.info("Sending SendInRequest: $json")
+            val value = json.toByteArray()
 
             sendInProducerService.publish(
                 topic = applicationConfig.kafkaSendIn.topic,
@@ -120,7 +122,7 @@ class SendEbxmlMessageAsyncUseCase(
             )
             EbxmlResult.Success(
                 "Message published to Kafka topic: ${applicationConfig.kafkaSendIn.topic}",
-                value.toString(Charsets.UTF_8)
+                "" //value.toString(Charsets.UTF_8)
             )
         } catch (ex: IllegalArgumentException) {
             log.error("Validation failed: ${ex.message}", ex)
