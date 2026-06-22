@@ -122,7 +122,7 @@ class SendEbxmlMessageAsyncUseCase(
             )
             EbxmlResult.Success(
                 "Message published to Kafka topic: ${applicationConfig.kafkaSendIn.topic}",
-                "" //value.toString(Charsets.UTF_8)
+                "" // value.toString(Charsets.UTF_8)
             )
         } catch (ex: IllegalArgumentException) {
             log.error("Validation failed: ${ex.message}", ex)
