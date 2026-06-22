@@ -2,19 +2,27 @@ package no.nav.emottak.test.client.application.ebxml.usecases
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import no.nav.emottak.test.client.application.ebxml.usecases.builders.EbxmlDocumentBuilder
 import no.nav.emottak.test.client.application.ebxml.usecases.builders.Encrypting
 import no.nav.emottak.test.client.domain.EbxmlResult
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.kafka.KafkaProducerService
+import no.nav.emottak.test.client.infrastructure.kafka.SendInProducerService
 import no.nav.emottak.test.client.infrastructure.smtp.PayloadDto
 import no.nav.emottak.test.client.infrastructure.smtp.SmtpTransportClient
 import no.nav.emottak.test.client.infrastructure.xml.xmlMarshaller
+import no.nav.emottak.utils.common.model.Addressing
+import no.nav.emottak.utils.common.model.EbmsProcessing
+import no.nav.emottak.utils.common.model.Party
+import no.nav.emottak.utils.common.model.PartyId
+import no.nav.emottak.utils.common.model.SendInRequest
 import org.slf4j.LoggerFactory
 
 class SendEbxmlMessageAsyncUseCase(
     private val applicationConfig: ApplicationConfig,
     private val kafkaProducerService: KafkaProducerService,
+    private val sendInProducerService: SendInProducerService,
     private val smtpTransportClient: SmtpTransportClient,
     private val encrypting: Encrypting = Encrypting()
 ) {
@@ -22,6 +30,10 @@ class SendEbxmlMessageAsyncUseCase(
     private val log = LoggerFactory.getLogger(SendEbxmlMessageAsyncUseCase::class.java)
 
     suspend fun sendEbxmlMessage(requestDto: EbxmlRequest): EbxmlResult {
+        if (requestDto.cpaId == "CPA_NO_EBXML") {
+            log.info("Sending CPA_NO_EBXML request, directly to async processing")
+            return sendSendInRequest(requestDto)
+        }
         return try {
             log.info("Validating ASYNC request")
             validateRequestDto(requestDto)
@@ -72,6 +84,50 @@ class SendEbxmlMessageAsyncUseCase(
         } catch (ex: Exception) {
             log.error("Error while sending async ebXML message: ${ex.message}", ex)
             EbxmlResult.Failure("Failed to send async message: ${ex.message}")
+        }
+    }
+
+    private fun sendSendInRequest(requestDto: EbxmlRequest): EbxmlResult {
+        return try {
+            log.info("Validating ASYNC request")
+            validateRequestDto(requestDto)
+
+            val builder = EbxmlDocumentBuilder(applicationConfig, requestDto)
+            val sendInRequest = SendInRequest(
+                messageId = requestDto.messageId,
+                conversationId = requestDto.conversationId,
+                payloadId = builder.payload!!.contentId.removePrefix("cid:"),
+                payload = builder.payload.bytes,
+                addressing = Addressing(
+                    Party(listOf(PartyId("HER", requestDto.fromPartyId)), requestDto.fromRole),
+                    Party(listOf(PartyId("HER", requestDto.toPartyId)), requestDto.toRole),
+                    requestDto.service,
+                    requestDto.action
+                ),
+                cpaId = requestDto.cpaId,
+                ebmsProcessing = EbmsProcessing(), // ikke i bruk
+                signedOf = "TODO", // requestDto.ebxmlPayload.signedBy, legg evt inn Fnr
+                requestId = requestDto.messageId, // todo evt gen uuid
+                partnerId = 0L // ikke i bruk
+            )
+            val key = sendInRequest.requestId
+            val value = Json.encodeToString<SendInRequest>(sendInRequest).toByteArray()
+
+            sendInProducerService.publish(
+                topic = applicationConfig.kafkaSendIn.topic,
+                key = key,
+                value = value
+            )
+            EbxmlResult.Success(
+                "Message published to Kafka topic: ${applicationConfig.kafkaSendIn.topic}",
+                value.toString(Charsets.UTF_8)
+            )
+        } catch (ex: IllegalArgumentException) {
+            log.error("Validation failed: ${ex.message}", ex)
+            EbxmlResult.Failure("Validation failed: ${ex.message}")
+        } catch (ex: Exception) {
+            log.error("Error while sending async SnedIn message: ${ex.message}", ex)
+            EbxmlResult.Failure("Failed to send async SendIn message: ${ex.message}")
         }
     }
 

@@ -40,6 +40,7 @@ import no.nav.emottak.test.client.application.ebxml.usecases.SendEbxmlMessageVia
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.config.applicationConfig
 import no.nav.emottak.test.client.infrastructure.kafka.KafkaProducerService
+import no.nav.emottak.test.client.infrastructure.kafka.SendInProducerService
 import no.nav.emottak.test.client.infrastructure.plugins.configureSerialization
 import no.nav.emottak.test.client.infrastructure.smtp.SmtpTransportClient
 import no.nav.emottak.utils.environment.getEnvVar
@@ -83,10 +84,12 @@ fun Application.testClientModule() {
     val sendEbxmlMessageUseCase = createSendEbxmlMessageUseCase(applicationConfig)
     val sendEbxmlMessageViaKafkaUseCase = createSendEbxmlMessageViaKafkaUseCase(applicationConfig)
     val kafkaProducerService = KafkaProducerService(applicationConfig.kafka.bootstrapServers)
+    val sendInProducerService = SendInProducerService(applicationConfig.kafkaSendIn.bootstrapServers)
     val smtpTransportClient = createSmtpTransportClient(applicationConfig)
     val sendEbxmlMessageAsyncUseCase = SendEbxmlMessageAsyncUseCase(
         applicationConfig,
         kafkaProducerService,
+        sendInProducerService,
         smtpTransportClient
     )
 
