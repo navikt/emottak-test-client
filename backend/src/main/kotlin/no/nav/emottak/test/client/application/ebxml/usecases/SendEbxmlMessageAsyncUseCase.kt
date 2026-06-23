@@ -109,7 +109,7 @@ class SendEbxmlMessageAsyncUseCase(
                 ),
                 cpaId = requestDto.cpaId,
                 ebmsProcessing = EbmsProcessing(), // ikke i bruk
-                signedOf = "TODO", // requestDto.ebxmlPayload.signedBy, legg evt inn Fnr
+                signedOf = "06758809488", // todo må evt settes i GUI
                 requestId = requestDto.messageId, // todo evt gen uuid
                 partnerId = 0L // ikke i bruk
             )
