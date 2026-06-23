@@ -94,6 +94,19 @@ class EbxmlDocumentBuilder(private val applicationConfig: ApplicationConfig, pri
         return signedDocument
     }
 
+    fun signPayload(payload: ByteArray): ByteArray {
+        log.info("Signing Payload")
+        val signedPayload = DocumentBuilderFactory.newInstance()
+            .apply { isNamespaceAware = true }
+            .newDocumentBuilder()
+            .parse(payload.inputStream())
+            .let { doc -> documentSigner.signerXML(doc).asByteArray() }
+        with(signedPayload.asDocument().retrieveSignatureElement()) {
+            checkSignatureValue(keyInfo.x509Certificate)
+        }
+        return signedPayload
+    }
+
     /**
      * Validerer signatur ifølge "Validering av ebXML-meldinger" 5.10.1
      */

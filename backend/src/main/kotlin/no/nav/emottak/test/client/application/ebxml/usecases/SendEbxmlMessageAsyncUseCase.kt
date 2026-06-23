@@ -93,8 +93,12 @@ class SendEbxmlMessageAsyncUseCase(
             log.info("Validating ASYNC request")
             validateRequestDto(requestDto)
 
-            val payload: ByteArray = removeWhitespace(Base64.getDecoder().decode(requestDto.ebxmlPayload!!.base64Content.trim()))
+            var payload: ByteArray = removeWhitespace(Base64.getDecoder().decode(requestDto.ebxmlPayload!!.base64Content.trim()))
             val contentId = requestDto.ebxmlPayload.contentId
+            val builder = EbxmlDocumentBuilder(applicationConfig, requestDto)
+            if (requestDto.signPayload == true) {
+                payload = builder.signPayload(payload)
+            }
 
             val sendInRequest = SendInRequest(
                 messageId = requestDto.messageId,
