@@ -93,7 +93,7 @@ class SendEbxmlMessageAsyncUseCase(
             log.info("Validating ASYNC request")
             validateRequestDto(requestDto)
 
-            val payload: ByteArray = Base64.getDecoder().decode(requestDto.ebxmlPayload!!.base64Content.trim())
+            val payload: ByteArray = removeWhitespace(Base64.getDecoder().decode(requestDto.ebxmlPayload!!.base64Content.trim()))
             val contentId = requestDto.ebxmlPayload.contentId
 
             val sendInRequest = SendInRequest(
@@ -134,6 +134,12 @@ class SendEbxmlMessageAsyncUseCase(
             log.error("Error while sending async SnedIn message: ${ex.message}", ex)
             EbxmlResult.Failure("Failed to send async SendIn message: ${ex.message}")
         }
+    }
+
+    fun removeWhitespace(xmlBytes: ByteArray): ByteArray {
+        val xml = String(xmlBytes, Charsets.UTF_8)
+        val removed = xml.replace("[\r\n]".toRegex(), "")
+        return removed.toByteArray(Charsets.UTF_8)
     }
 
     private fun validateRequestDto(requestDto: EbxmlRequest) {
