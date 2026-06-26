@@ -21,7 +21,8 @@ data class ApplicationConfig(
     val signing: SigningConfig,
     val server: Server,
     val kafka: KafkaConfig = KafkaConfig(),
-    val kafkaOut: KafkaOutConfig = KafkaOutConfig()
+    val kafkaOut: KafkaOutConfig = KafkaOutConfig(),
+    val kafkaSendIn: SendInKafkaConfig = SendInKafkaConfig()
 )
 
 data class SigningConfig(
@@ -38,4 +39,9 @@ data class KafkaOutConfig(
 data class KafkaConfig(
     val bootstrapServers: String = "localhost:9092",
     val topic: String = "team-emottak.smtp.in.ebxml.payload"
+)
+
+data class SendInKafkaConfig(
+    val bootstrapServers: String = "localhost:9092",
+    val topic: String = "team-emottak.ebms.in.payload"
 )
