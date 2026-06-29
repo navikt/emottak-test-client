@@ -96,10 +96,11 @@ class SendEbxmlMessageAsyncUseCase(
             var payload: ByteArray = removeWhitespace(Base64.getDecoder().decode(requestDto.ebxmlPayload!!.base64Content.trim()))
             val contentId = requestDto.ebxmlPayload.contentId
             val builder = EbxmlDocumentBuilder(applicationConfig, requestDto)
-            if (requestDto.signPayload == true) {
-                payload = builder.signPayload(payload)
-            }
+//            if (requestDto.signPayload == true) {
+//                payload = builder.signPayload(payload)
+//            }
 
+            val sendInRequestTemplate = getTemplateValues(requestDto.service)
             val sendInRequest = SendInRequest(
                 messageId = requestDto.messageId,
                 conversationId = requestDto.conversationId,
@@ -113,9 +114,9 @@ class SendEbxmlMessageAsyncUseCase(
                 ),
                 cpaId = requestDto.cpaId,
                 ebmsProcessing = EbmsProcessing(), // ikke i bruk
-                signedOf = "06758809488", // todo må evt settes i GUI
-                requestId = requestDto.messageId, // todo evt gen uuid
-                partnerId = 0L // ikke i bruk
+                signedOf = sendInRequestTemplate.signedOf,
+                requestId = requestDto.messageId,
+                partnerId = sendInRequestTemplate.partnerId
             )
             val key = sendInRequest.requestId
             val json = Json.encodeToString<SendInRequest>(sendInRequest)
