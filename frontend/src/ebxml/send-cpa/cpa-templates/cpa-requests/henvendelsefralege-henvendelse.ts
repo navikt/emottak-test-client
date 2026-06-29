@@ -19,7 +19,7 @@ export const henvendelsefralegeHenvendelse: EbxmlRequest = {
   ebxmlPayload: {
     base64Content: encodeXmlToBase64(
       `
-    <MsgHead xmlns="http://www.kith.no/xmlstds/msghead/2006-05-24">
+    <MsgHead xmlns="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <MsgInfo>
             <Type DN="Notat" V="DIALOG_NOTAT" />
             <MIGversion>v1.2 2006-05-24</MIGversion>
