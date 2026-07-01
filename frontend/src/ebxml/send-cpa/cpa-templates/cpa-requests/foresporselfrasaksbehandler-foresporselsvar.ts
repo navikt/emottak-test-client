@@ -15,7 +15,8 @@ export const foresporselfrasaksbehandlerForesporselsvar: EbxmlRequest = {
   signPayload: true,
   encryptPayload: true,
   useNewEmottakFlow: true,
-  sendAsync: true,
+  sendAsync: false,
+  directSendin: true,
   ebxmlPayload: {
     base64Content: encodeXmlToBase64(
       `

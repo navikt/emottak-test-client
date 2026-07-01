@@ -13,6 +13,7 @@ export interface EbxmlRequest {
   encryptPayload: boolean;
   useNewEmottakFlow: boolean;
   sendAsync: boolean;
+  directSendin: boolean;
 }
 
 export interface EbxmlPayload {

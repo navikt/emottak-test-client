@@ -31,10 +31,6 @@ class SendEbxmlMessageAsyncUseCase(
     private val log = LoggerFactory.getLogger(SendEbxmlMessageAsyncUseCase::class.java)
 
     suspend fun sendEbxmlMessage(requestDto: EbxmlRequest): EbxmlResult {
-        if (requestDto.cpaId == "CPA_NO_EBXML") {
-            log.info("Sending CPA_NO_EBXML request, directly to async processing")
-            return sendSendInRequest(requestDto)
-        }
         return try {
             log.info("Validating ASYNC request")
             validateRequestDto(requestDto)
@@ -88,14 +84,14 @@ class SendEbxmlMessageAsyncUseCase(
         }
     }
 
-    private fun sendSendInRequest(requestDto: EbxmlRequest): EbxmlResult {
+    suspend fun sendSendInRequest(requestDto: EbxmlRequest): EbxmlResult {
         return try {
             log.info("Validating ASYNC request")
             validateRequestDto(requestDto)
 
             var payload: ByteArray = removeWhitespace(Base64.getDecoder().decode(requestDto.ebxmlPayload!!.base64Content.trim()))
             val contentId = requestDto.ebxmlPayload.contentId
-            val builder = EbxmlDocumentBuilder(applicationConfig, requestDto)
+//            val builder = EbxmlDocumentBuilder(applicationConfig, requestDto)
 //            if (requestDto.signPayload == true) {
 //                payload = builder.signPayload(payload)
 //            }

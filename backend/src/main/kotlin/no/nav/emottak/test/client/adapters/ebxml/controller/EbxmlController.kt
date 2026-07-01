@@ -51,7 +51,9 @@ fun Routing.sendEbxmlMessageRoute(
             val dto = Json.decodeFromString<EbxmlRequestDto>(requestBody)
             val ebxmlRequest = dto.toDomain()
 
-            val result = if (dto.sendAsync) {
+            val result = if (dto.directSendin) {
+                sendEbxmlMessageAsyncUseCase.sendSendInRequest(ebxmlRequest)
+            } else if (dto.sendAsync) {
                 sendEbxmlMessageAsyncUseCase.sendEbxmlMessage(ebxmlRequest)
             } else {
                 sendEbxmlMessageUseCase.sendEbxmlMessage(ebxmlRequest)
@@ -88,7 +90,8 @@ data class EbxmlRequestDto(
     val signPayload: Boolean = false,
     val encryptPayload: Boolean = false,
     val useNewEmottakFlow: Boolean = true,
-    val sendAsync: Boolean = false
+    val sendAsync: Boolean = false,
+    val directSendin: Boolean = false
 ) {
     @Serializable
     data class PayloadDto(
