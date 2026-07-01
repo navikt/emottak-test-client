@@ -52,6 +52,7 @@ export default function EbxmlForm() {
       encryptPayload: false,
       useNewEmottakFlow: true,
       sendAsync: false,
+      directSendin: false,
       ebxmlPayload: { base64Content: "" },
     });
     setError(null);
@@ -185,6 +186,42 @@ export default function EbxmlForm() {
                             </p>
                             <p>
                                 <b>Disabled</b>: Sender meldingen synkront via HTTP til ebms-sync-router (standard).
+                            </p>
+                        </div>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
+            <div className="flex items-center mt-6 gap-2">
+                <Checkbox
+                    id="directSendin"
+                    checked={formData.directSendin}
+                    onCheckedChange={(checked) =>
+                        setFormData((prev) => ({ ...prev, directSendin: !!checked }))
+                    }
+                />
+                <Label htmlFor="directSendin" className="select-none cursor-pointer">
+                    Directly to SendIn
+                </Label>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            type="button"
+                            aria-label="What means Directly to SendIn?"
+                            className="flex h-5 w-5 items-center justify-center rounded hover:bg-muted"
+                        >
+                            <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm text-sm leading-relaxed">
+                        <div className="space-y-1">
+                            <p className="font-medium">Sending directly to SendIn</p>
+                            <p>
+                                <b>Enabled</b>: Publiserer payload som SendInRequest (uten Ebxml) til
+                                Kafka-topicet <em>team-emottak.ebms.in.payload</em>. Prosesseres av{" "}
+                                <em>ebms-send-in</em>.
+                            </p>
+                            <p>
+                                <b>Disabled</b>: Sender meldingen til ebms-sync-router eller ebms-async.
                             </p>
                         </div>
                     </TooltipContent>

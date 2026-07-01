@@ -16,6 +16,7 @@ export const frikortMengdeEgenandelForesporselRequest: EbxmlRequest = {
   encryptPayload: true,
   useNewEmottakFlow: true,
   sendAsync: true,
+  directSendin: false,
   ebxmlPayload: {
     base64Content: encodeXmlToBase64(
       `

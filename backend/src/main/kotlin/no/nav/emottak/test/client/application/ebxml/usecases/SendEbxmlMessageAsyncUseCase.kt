@@ -2,19 +2,28 @@ package no.nav.emottak.test.client.application.ebxml.usecases
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import no.nav.emottak.test.client.application.ebxml.usecases.builders.EbxmlDocumentBuilder
 import no.nav.emottak.test.client.application.ebxml.usecases.builders.Encrypting
 import no.nav.emottak.test.client.domain.EbxmlResult
 import no.nav.emottak.test.client.infrastructure.config.ApplicationConfig
 import no.nav.emottak.test.client.infrastructure.kafka.KafkaProducerService
+import no.nav.emottak.test.client.infrastructure.kafka.SendInProducerService
 import no.nav.emottak.test.client.infrastructure.smtp.PayloadDto
 import no.nav.emottak.test.client.infrastructure.smtp.SmtpTransportClient
 import no.nav.emottak.test.client.infrastructure.xml.xmlMarshaller
+import no.nav.emottak.utils.common.model.Addressing
+import no.nav.emottak.utils.common.model.EbmsProcessing
+import no.nav.emottak.utils.common.model.Party
+import no.nav.emottak.utils.common.model.PartyId
+import no.nav.emottak.utils.common.model.SendInRequest
 import org.slf4j.LoggerFactory
+import java.util.Base64
 
 class SendEbxmlMessageAsyncUseCase(
     private val applicationConfig: ApplicationConfig,
     private val kafkaProducerService: KafkaProducerService,
+    private val sendInProducerService: SendInProducerService,
     private val smtpTransportClient: SmtpTransportClient,
     private val encrypting: Encrypting = Encrypting()
 ) {
@@ -73,6 +82,65 @@ class SendEbxmlMessageAsyncUseCase(
             log.error("Error while sending async ebXML message: ${ex.message}", ex)
             EbxmlResult.Failure("Failed to send async message: ${ex.message}")
         }
+    }
+
+    suspend fun sendSendInRequest(requestDto: EbxmlRequest): EbxmlResult {
+        return try {
+            log.info("Validating ASYNC request")
+            validateRequestDto(requestDto)
+
+            var payload: ByteArray = removeWhitespace(Base64.getDecoder().decode(requestDto.ebxmlPayload!!.base64Content.trim()))
+            val contentId = requestDto.ebxmlPayload.contentId
+//            val builder = EbxmlDocumentBuilder(applicationConfig, requestDto)
+//            if (requestDto.signPayload == true) {
+//                payload = builder.signPayload(payload)
+//            }
+
+            val sendInRequestTemplate = getTemplateValues(requestDto.service)
+            val sendInRequest = SendInRequest(
+                messageId = requestDto.messageId,
+                conversationId = requestDto.conversationId,
+                payloadId = contentId.removePrefix("cid:"),
+                payload = payload,
+                addressing = Addressing(
+                    Party(listOf(PartyId("HER", requestDto.toPartyId)), requestDto.toRole),
+                    Party(listOf(PartyId("HER", requestDto.fromPartyId)), requestDto.fromRole),
+                    requestDto.service,
+                    requestDto.action
+                ),
+                cpaId = requestDto.cpaId,
+                ebmsProcessing = EbmsProcessing(), // ikke i bruk
+                signedOf = sendInRequestTemplate.signedOf,
+                requestId = requestDto.messageId,
+                partnerId = sendInRequestTemplate.partnerId
+            )
+            val key = sendInRequest.requestId
+            val json = Json.encodeToString<SendInRequest>(sendInRequest)
+            log.info("Sending SendInRequest: $json")
+            val value = json.toByteArray()
+
+            sendInProducerService.publish(
+                topic = applicationConfig.kafkaSendIn.topic,
+                key = key,
+                value = value
+            )
+            EbxmlResult.Success(
+                "Message published to Kafka topic: ${applicationConfig.kafkaSendIn.topic}",
+                "" // value.toString(Charsets.UTF_8)
+            )
+        } catch (ex: IllegalArgumentException) {
+            log.error("Validation failed: ${ex.message}", ex)
+            EbxmlResult.Failure("Validation failed: ${ex.message}")
+        } catch (ex: Exception) {
+            log.error("Error while sending async SnedIn message: ${ex.message}", ex)
+            EbxmlResult.Failure("Failed to send async SendIn message: ${ex.message}")
+        }
+    }
+
+    fun removeWhitespace(xmlBytes: ByteArray): ByteArray {
+        val xml = String(xmlBytes, Charsets.UTF_8)
+        val removed = xml.replace("[\r\n]".toRegex(), "")
+        return removed.toByteArray(Charsets.UTF_8)
     }
 
     private fun validateRequestDto(requestDto: EbxmlRequest) {
