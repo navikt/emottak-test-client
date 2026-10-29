@@ -79,7 +79,7 @@ dependencies {
     implementation("no.nav.emottak:emottak-utils:0.3.2")
     implementation("no.nav.emottak:emottak-payload-xsd:0.0.11")
     implementation("no.nav.emottak:ebxml-protokoll:0.0.7")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.12.0")
 
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
     implementation("org.apache.santuario:xmlsec:3.0.3")
