@@ -89,8 +89,8 @@ dependencies {
     implementation(platform("io.insert-koin:koin-bom:$koin_version"))
     implementation("io.insert-koin:koin-core")
 
-    implementation("com.sksamuel.hoplite:hoplite-core:2.8.2")
-    implementation("com.sksamuel.hoplite:hoplite-yaml:2.8.2")
+    implementation("com.sksamuel.hoplite:hoplite-core:3.0.5")
+    implementation("com.sksamuel.hoplite:hoplite-yaml:3.0.5")
 
     implementation("io.arrow-kt:arrow-core:2.2.3")
     implementation("io.arrow-kt:arrow-fx-coroutines:2.2.3")
