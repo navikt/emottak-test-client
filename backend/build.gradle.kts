@@ -82,7 +82,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.12.0")
 
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
-    implementation("org.apache.santuario:xmlsec:3.0.3")
+    implementation("org.apache.santuario:xmlsec:4.0.4")
     implementation("org.apache.kafka:kafka-clients:$kafka_version")
     implementation("com.nimbusds:nimbus-jose-jwt:10.10")
 
