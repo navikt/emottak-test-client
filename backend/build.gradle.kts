@@ -1,8 +1,11 @@
-val kotlin_version: String by project
-val logback_version: String by project
-val ktor_version: String by project
-val koin_version: String by project
-val kafka_version: String by project
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
+
+val kotlin_version = project.property("kotlin_version") as String
+val logback_version = project.property("logback_version") as String
+val ktor_version = project.property("ktor_version") as String
+val koin_version = project.property("koin_version") as String
+val kafka_version = project.property("kafka_version") as String
 
 plugins {
     kotlin("jvm") version "2.2.21"
@@ -108,6 +111,10 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
+abstract class BuildProcess @Inject constructor(val execOperations: ExecOperations)
+
+val buildProcess = objects.newInstance<BuildProcess>()
+
 tasks {
 
     shadowJar {
@@ -142,7 +149,7 @@ tasks {
                 println("Development mode enabled. Starting continuous build with hot-reloading...")
 
                 Thread {
-                    exec {
+                    buildProcess.execOperations.exec {
                         commandLine("./gradlew", "build", "--continuous")
                         isIgnoreExitValue = true
                     }
