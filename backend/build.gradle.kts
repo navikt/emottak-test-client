@@ -8,7 +8,7 @@ val koin_version = project.property("koin_version") as String
 val kafka_version = project.property("kafka_version") as String
 
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.4.21"
     kotlin("plugin.serialization") version "2.4.21"
     id("io.ktor.plugin") version "3.6.1"
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
