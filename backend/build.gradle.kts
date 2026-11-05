@@ -95,10 +95,10 @@ dependencies {
     implementation("com.sksamuel.hoplite:hoplite-core:3.0.5")
     implementation("com.sksamuel.hoplite:hoplite-yaml:3.0.5")
 
-    implementation("io.arrow-kt:arrow-core:2.2.3")
-    implementation("io.arrow-kt:arrow-fx-coroutines:2.2.3")
-    implementation("io.arrow-kt:suspendapp:2.2.3")
-    implementation("io.arrow-kt:suspendapp-ktor:2.2.3")
+    implementation("io.arrow-kt:arrow-core:2.3.0.1")
+    implementation("io.arrow-kt:arrow-fx-coroutines:2.3.0.1")
+    implementation("io.arrow-kt:suspendapp:2.3.0.1")
+    implementation("io.arrow-kt:suspendapp-ktor:2.3.0.1")
 
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
