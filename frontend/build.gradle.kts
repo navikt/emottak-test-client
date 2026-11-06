@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 plugins {
-    id("com.github.node-gradle.node") version "3.0.1"
+    id("com.github.node-gradle.node") version "7.1.0"
 }
 
 node {
