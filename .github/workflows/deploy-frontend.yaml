@@ -36,7 +36,7 @@ jobs:
         env:
           PRODUCTION: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: nais/docker-build-push@v0
+      - uses: nais/docker-build-push@v1
         id: docker-push-frontend
         with:
           team: team-emottak
